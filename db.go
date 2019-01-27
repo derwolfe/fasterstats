@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"database/sql"
@@ -7,12 +7,34 @@ import (
 	"log"
 )
 
-func buildDB() *sql.DB {
+func BuildDB() (*OurDB, error) {
+	// mark the connection as read only!
 	db, err := sql.Open("sqlite3", "./results.db")
 	if err != nil {
 		log.Fatal(err)
 	}
-	return db
+
+	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like ?`)
+	if err != nil {
+		return nil, err
+	}
+
+	resultsStmt, err := db.Prepare(`SELECT * FROM results WHERE lifter = ? and weight_class = ? ORDER BY date ASC`)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OurDB{
+		db: db,
+		nameQuery: nameStmt,
+		resultsQuery: resultsStmt,
+	}, nil
+}
+
+func (o *OurDB) Close() {
+	o.nameQuery.Close()
+	o.resultsQuery.Close()
+	o.db.Close()
 }
 
 type Lifter struct {
@@ -36,20 +58,26 @@ type Result struct {
 	URL         string
 }
 
-func QueryForNames(db *sql.DB, name string) ([]Lifter, error) {
-	rows, err := db.Query(`SELECT lifter, name FROM results WHERE lifter like ?`, name)
+type OurDB struct {
+	db *sql.DB
+	nameQuery *sql.Stmt
+	resultsQuery *sql.Stmt
+}
+
+func (o *OurDB) QueryForNames(name string) ([]Lifter, error) {
+	rows, err := o.nameQuery.Query(name)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
 	// get the length of results
 	lifters := make([]Lifter, 100)
 	for rows.Next() {
-		var l Lifter
+		l := Lifter{}
 		err = rows.Scan(&l.Name, &l.Hometown)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		lifters = append(lifters, l)
 	}
@@ -60,8 +88,8 @@ func QueryForNames(db *sql.DB, name string) ([]Lifter, error) {
 	return lifters, nil
 }
 
-func QueryResults(db *sql.DB, name, weightclass string) ([]Result, error) {
-	rows, err := db.Query(`SELECT * FROM results WHERE name = ? and weightclass = ? ORDER BY date ASC`)
+func (o *OurDB) QueryResults(name, weightclass string) ([]Result, error) {
+	rows, err := o.resultsQuery.Query(name, weightclass)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +97,7 @@ func QueryResults(db *sql.DB, name, weightclass string) ([]Result, error) {
 
 	results := make([]Result, 100)
 	for rows.Next() {
-		var r Result
+		r := Result{}
 		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.WeightClass, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.URL)
 		if err != nil {
 			return nil, err
@@ -80,9 +108,4 @@ func QueryResults(db *sql.DB, name, weightclass string) ([]Result, error) {
 		return nil, err
 	}
 	return results, nil
-}
-
-func main() {
-	db := buildDB()
-	defer db.Close()
 }
