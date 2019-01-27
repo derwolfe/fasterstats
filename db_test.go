@@ -13,10 +13,31 @@ func TestQueryNames(t *testing.T) {
 	assert.Nil(t, err, "failed to build db")
 
 	// this relies on data in the DB!
-	lifters, err := db.QueryForNames("d'angelo")
+	lifters, err := db.QueryNames("francisco flores")
 
 	assert.Nil(t, err, "query for names returned an error")
 	fmt.Printf("%v\n", lifters)
 
 	// assert that d'angelo and a few others are in the data set
+}
+
+func TestQueryResults(t *testing.T) {
+	db, err := BuildDB()
+	defer db.Close()
+
+	assert.Nil(t, err, "failed to build db")
+
+	// this relies on data in the DB!
+	lifters, err := db.QueryNames("francisco flores")
+	assert.Nil(t, err, "query for names returned an error")
+	assert.NotEmpty(t, lifters, "no names returned")
+
+	results, err := db.QueryResults(lifters[0].Name, lifters[0].Hometown)
+	assert.Nil(t, err, "query for results failed")
+
+	assert.NotEmpty(t, results, "no results for lifter")
+	for _, result := range results {
+		// let's make sure we have what we expect
+		fmt.Printf("%v\n", result)
+	}
 }

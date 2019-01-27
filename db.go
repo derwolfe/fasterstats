@@ -14,19 +14,19 @@ func BuildDB() (*OurDB, error) {
 		log.Fatal(err)
 	}
 
-	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like ? ORDER BY lifter ASC`)
+	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like $1 ORDER BY lifter ASC`)
 	if err != nil {
 		return nil, err
 	}
 
-	resultsStmt, err := db.Prepare(`SELECT * FROM results WHERE lifter = ? and hometown = ? ORDER BY date ASC`)
+	resultsStmt, err := db.Prepare(`SELECT date, meet_name, lifter, weight_class, hometown, cj1, cj2, cj3, sn1, sn2, sn3, total, url FROM results WHERE lifter = $1 and hometown = $2 ORDER BY date ASC`)
 	if err != nil {
 		return nil, err
 	}
 
 	return &OurDB{
-		db: db,
-		nameQuery: nameStmt,
+		db:           db,
+		nameQuery:    nameStmt,
 		resultsQuery: resultsStmt,
 	}, nil
 }
@@ -46,7 +46,7 @@ type Result struct {
 	Date        string
 	MeetName    string
 	Lifter      string
-	WeightClass string
+	Weightclass string
 	Hometown    string
 	CJ1         decimal.Decimal
 	CJ2         decimal.Decimal
@@ -59,12 +59,12 @@ type Result struct {
 }
 
 type OurDB struct {
-	db *sql.DB
-	nameQuery *sql.Stmt
+	db           *sql.DB
+	nameQuery    *sql.Stmt
 	resultsQuery *sql.Stmt
 }
 
-func (o *OurDB) QueryForNames(name string) ([]Lifter, error) {
+func (o *OurDB) QueryNames(name string) ([]Lifter, error) {
 	rows, err := o.nameQuery.Query("%" + name + "%")
 	if err != nil {
 		return nil, err
@@ -98,10 +98,11 @@ func (o *OurDB) QueryResults(name, hometown string) ([]Result, error) {
 	var results []Result
 	for rows.Next() {
 		r := Result{}
-		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.WeightClass, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.URL)
+		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.Weightclass, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.URL)
 		if err != nil {
 			return nil, err
 		}
+		results = append(results, r)
 	}
 	err = rows.Err()
 	if err != nil {
