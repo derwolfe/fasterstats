@@ -14,7 +14,7 @@ func BuildDB() (*OurDB, error) {
 		log.Fatal(err)
 	}
 
-	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like ?`)
+	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like ? ORDER BY lifter ASC`)
 	if err != nil {
 		return nil, err
 	}
@@ -65,14 +65,14 @@ type OurDB struct {
 }
 
 func (o *OurDB) QueryForNames(name string) ([]Lifter, error) {
-	rows, err := o.nameQuery.Query(name)
+	rows, err := o.nameQuery.Query("%" + name + "%")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	// get the length of results
-	lifters := make([]Lifter, 100)
+	var lifters []Lifter
 	for rows.Next() {
 		l := Lifter{}
 		err = rows.Scan(&l.Name, &l.Hometown)
@@ -95,7 +95,7 @@ func (o *OurDB) QueryResults(name, weightclass string) ([]Result, error) {
 	}
 	defer rows.Close()
 
-	results := make([]Result, 100)
+	var results []Result
 	for rows.Next() {
 		r := Result{}
 		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.WeightClass, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.URL)
