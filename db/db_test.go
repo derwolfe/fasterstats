@@ -17,8 +17,6 @@ func TestQueryNames(t *testing.T) {
 
 	assert.Nil(t, err, "query for names returned an error")
 	fmt.Printf("%v\n", lifters)
-
-	// assert that d'angelo and a few others are in the data set
 }
 
 func TestQueryResults(t *testing.T) {
@@ -28,7 +26,7 @@ func TestQueryResults(t *testing.T) {
 	assert.Nil(t, err, "failed to build db")
 
 	// this relies on data in the DB!
-	lifters, err := db.QueryNames("francisco flores")
+	lifters, err := db.QueryNames("chris wolfe")
 	assert.Nil(t, err, "query for names returned an error")
 	assert.NotEmpty(t, lifters, "no names returned")
 
