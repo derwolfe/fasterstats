@@ -19,7 +19,7 @@ func BuildDB() (*OurDB, error) {
 		return nil, err
 	}
 
-	resultsStmt, err := db.Prepare(`SELECT * FROM results WHERE lifter = ? and weight_class = ? ORDER BY date ASC`)
+	resultsStmt, err := db.Prepare(`SELECT * FROM results WHERE lifter = ? and hometown = ? ORDER BY date ASC`)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +88,8 @@ func (o *OurDB) QueryForNames(name string) ([]Lifter, error) {
 	return lifters, nil
 }
 
-func (o *OurDB) QueryResults(name, weightclass string) ([]Result, error) {
-	rows, err := o.resultsQuery.Query(name, weightclass)
+func (o *OurDB) QueryResults(name, hometown string) ([]Result, error) {
+	rows, err := o.resultsQuery.Query(name, hometown)
 	if err != nil {
 		return nil, err
 	}
