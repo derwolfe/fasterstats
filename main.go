@@ -24,9 +24,8 @@ var searchNamesResults = `<!doctype html>
 				<input type="submit" value="">
 			</form>
 		<ul>
-			{{ len .}}
 			{{ range .}}
-				<li>{{ .Lifter }} - {{ .Hometown }}</li>
+				<li>{{ .Name }} - {{ .Hometown }}</li>
 			{{ end }}
 		</ul>
 		</div>
@@ -34,6 +33,7 @@ var searchNamesResults = `<!doctype html>
 </html>`
 
 var searchNamesResultsTemplate = template.Must(template.New("names found").Parse(searchNamesResults))
+// var liftingResultsTemplte = template.Must(template.New("results found").Parse())
 
 // this should be used inside of another template, not sure how to do that now
 var findLiftersForm = []byte(`<!doctype html>
