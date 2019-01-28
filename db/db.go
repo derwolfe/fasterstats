@@ -23,7 +23,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		return nil, err
 	}
 
-	resultsStmt, err := db.Prepare(`SELECT date, meet_name, lifter, weight_class, hometown, cj1, cj2, cj3, sn1, sn2, sn3, total, url FROM results WHERE lifter = $1 and hometown = $2 ORDER BY date ASC`)
+	resultsStmt, err := db.Prepare(`SELECT date, meet_name, lifter, weight_class, hometown, cj1, cj2, cj3, sn1, sn2, sn3, total, url FROM results WHERE lifter = $1 and hometown = $2 ORDER BY date DESC`)
 	if err != nil {
 		return nil, err
 	}
