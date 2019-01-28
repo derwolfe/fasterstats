@@ -25,7 +25,28 @@ var searchNamesResults = `<!doctype html>
 			</form>
 		<ul>
 			{{ range .}}
-				<li>{{ .Name }} - {{ .Hometown }}</li>
+				<li><a href="results?name={{ .Name }}&hometown={{ .Hometown }}">{{ .Name }} - {{ .Hometown }}</li></a>
+			{{ end }}
+		</ul>
+		</div>
+	</body>
+</html>`
+
+var liftingResults = `<!doctype html>
+<html>
+	<head>
+		<title>Lifter finder</title>
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	</head>
+	<body>
+		<div>
+			<form action="/search" method="post">
+				Lifter:<input type="string" name="name">
+				<input type="submit" value="">
+			</form>
+		<ul>
+			{{ range .}}
+				<li>{{ . }}</li>
 			{{ end }}
 		</ul>
 		</div>
@@ -33,7 +54,7 @@ var searchNamesResults = `<!doctype html>
 </html>`
 
 var searchNamesResultsTemplate = template.Must(template.New("names found").Parse(searchNamesResults))
-// var liftingResultsTemplte = template.Must(template.New("results found").Parse())
+var liftingResultsTemplate = template.Must(template.New("results found").Parse(liftingResults))
 
 // this should be used inside of another template, not sure how to do that now
 var findLiftersForm = []byte(`<!doctype html>
@@ -66,8 +87,23 @@ func (a api) search(w http.ResponseWriter, r *http.Request){
 	w.Write(findLiftersForm)
 }
 
-// func (a Api) results(w http.ResponseWriter, r *http.Request) {
-// }
+func (a api) results(w http.ResponseWriter, r *http.Request) {
+	names, ok := r.URL.Query()["name"]
+	if !ok || len(names) != 1 {
+		// XXX this should be http error
+		panic("no name")
+	}
+	hometowns, ok := r.URL.Query()["hometown"]
+	if !ok || len(hometowns) != 1 {
+		// this should be http error
+		panic("no hometown")
+	}
+	found, err := a.db.QueryResults(names[0], hometowns[0])
+	if err != nil {
+		panic(err)
+	}
+	liftingResultsTemplate.Execute(w, found)
+}
 
 func main() {
 	db, err := db.BuildDB("./results.db")
@@ -77,6 +113,7 @@ func main() {
 	api := api{db: db}
 
 	http.HandleFunc("/search", api.search)
+	http.HandleFunc("/results", api.results)
 
 	err = http.ListenAndServe(":9090", nil) // setting listening port
 	if err != nil {
