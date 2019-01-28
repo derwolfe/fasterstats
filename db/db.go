@@ -7,9 +7,9 @@ import (
 	"log"
 )
 
-func BuildDB() (*OurDB, error) {
+func BuildDB(dbPath string) (*OurDB, error) {
 	// mark the connection as read only!
-	db, err := sql.Open("sqlite3", "./results.db")
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,0 +1,85 @@
+package main
+
+import (
+	"log"
+	"net/http"
+	"html/template"
+	"gitlab.com/derwolfe/faststats/db"
+)
+
+type api struct {
+	db *db.OurDB
+}
+
+var searchNamesResults = `<!doctype html>
+<html>
+	<head>
+		<title>Lifter finder</title>
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	</head>
+	<body>
+		<div>
+			<form action="/search" method="post">
+				Lifter:<input type="string" name="name">
+				<input type="submit" value="">
+			</form>
+		<ul>
+			{{ len .}}
+			{{ range .}}
+				<li>{{ .Lifter }} - {{ .Hometown }}</li>
+			{{ end }}
+		</ul>
+		</div>
+	</body>
+</html>`
+
+var searchNamesResultsTemplate = template.Must(template.New("names found").Parse(searchNamesResults))
+
+// this should be used inside of another template, not sure how to do that now
+var findLiftersForm = []byte(`<!doctype html>
+<html>
+	<head>
+		<title>Lifter finder</title>
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	</head>
+	<body>
+		<form action="/search" method="post">
+			Lifter:<input type="string" name="name">
+			<input type="submit" value="">
+		</form>
+	</body>
+</html>`)
+
+func (a api) search(w http.ResponseWriter, r *http.Request){
+	// display a form, if a post, display results
+	if r.Method == "POST" {
+		r.ParseForm()
+		// this needs validation! should be characters, maybe a digit, spaces
+		name := r.FormValue("name")
+		found, err := a.db.QueryNames(name)
+		if err != nil {
+			panic(err)
+		}
+		searchNamesResultsTemplate.Execute(w, found)
+		return
+	}
+	w.Write(findLiftersForm)
+}
+
+// func (a Api) results(w http.ResponseWriter, r *http.Request) {
+// }
+
+func main() {
+	db, err := db.BuildDB("./results.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	api := api{db: db}
+
+	http.HandleFunc("/search", api.search)
+
+	err = http.ListenAndServe(":9090", nil) // setting listening port
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+}

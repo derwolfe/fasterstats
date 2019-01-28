@@ -7,7 +7,7 @@ import (
 )
 
 func TestQueryNames(t *testing.T) {
-	db, err := BuildDB()
+	db, err := BuildDB("../results.db")
 	defer db.Close()
 
 	assert.Nil(t, err, "failed to build db")
@@ -20,7 +20,7 @@ func TestQueryNames(t *testing.T) {
 }
 
 func TestQueryResults(t *testing.T) {
-	db, err := BuildDB()
+	db, err := BuildDB("../results.db")
 	defer db.Close()
 
 	assert.Nil(t, err, "failed to build db")
