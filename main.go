@@ -20,8 +20,8 @@ var searchNamesResults = `<!doctype html>
 	<body>
 		<div>
 			<form action="/search" method="post">
-				Lifter:<input type="string" name="name">
-				<input type="submit" value="">
+				Lifter:<input type="string" name="name" required minlength=3>
+				<input type="submit" value="Search!">
 			</form>
 			<ul>
 				{{ range .}}
@@ -41,14 +41,46 @@ var liftingResults = `<!doctype html>
 	<body>
 		<div>
 			<form action="/search" method="post">
-				Lifter:<input type="string" name="name">
-				<input type="submit" value="">
+				Lifter:<input type="string" name="name" required minlength=3>
+				<input type="submit" value="Search!">
 			</form>
-			<ul>
-				{{ range .}}
-					<li>{{ . }}</li>
-				{{ end }}
-			</ul>
+			<div class="table-responsive">
+            <table class="table table-striped w-auto">
+                <thead>
+                    <tr>
+                        <th scope="col">Meet Date</th>
+                        <th scope="col">Meet</th>
+                        <th scope="col">Class</th>
+                        <th scope="col">Lifter</th>
+                        <th scope="col">Hometown</th>
+                        <th scope="col">SN1</th>
+                        <th scope="col">SN2</th>
+                        <th scope="col">SN3</th>
+                        <th scope="col">CJ1</th>
+                        <th scope="col">CJ2</th>
+                        <th scope="col">CJ3</th>
+                        <th scope="col">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range . }}
+                    <tr>
+                        <td>{{ .Date }}</td>
+						<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
+                        <td>{{ .Weightclass }}</td>
+                        <td>{{ .Lifter }}</td>
+                        <td>{{ .Hometown }}</td>
+                        <td>{{ .SN1 }}</td>
+                        <td>{{ .SN2 }}</td>
+                        <td>{{ .SN3 }}</td>
+                        <td>{{ .CJ1 }}</td>
+                        <td>{{ .CJ2 }}</td>
+                        <td>{{ .CJ3 }}</td>
+                        <td>{{ .Total }}</td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
 		</div>
 	</body>
 </html>`
@@ -65,7 +97,7 @@ var findLiftersForm = []byte(`<!doctype html>
 	</head>
 	<body>
 		<form action="/search" method="post">
-			Lifter:<input type="string" name="name">
+			Lifter:<input type="string" name="name" required minlength=3>
 			<input type="submit" value="">
 		</form>
 	</body>
@@ -77,6 +109,11 @@ func (a api) search(w http.ResponseWriter, r *http.Request){
 		r.ParseForm()
 		// this needs validation! should be characters, maybe a digit, spaces
 		name := r.FormValue("name")
+		if len(name) < 3 {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("400 - Search name must be greater than 3 characters"))
+			return
+		}
 		found, err := a.db.QueryNames(name)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

@@ -18,7 +18,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		log.Fatal(err)
 	}
 
-	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like $1 ORDER BY lifter ASC`)
+	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like $1 ORDER BY lifter ASC LIMIT 100`)
 	if err != nil {
 		return nil, err
 	}
