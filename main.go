@@ -109,6 +109,7 @@ func (a api) search(w http.ResponseWriter, r *http.Request){
 		r.ParseForm()
 		// this needs validation! should be characters, maybe a digit, spaces
 		name := r.FormValue("name")
+		// this could be allowed and use pagination
 		if len(name) < 3 {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("400 - Search name must be greater than 3 characters"))
@@ -158,6 +159,7 @@ func main() {
 	http.HandleFunc("/search", api.search)
 	http.HandleFunc("/results", api.results)
 
+	log.Println("Starting on :9090")
 	err = http.ListenAndServe(":9090", nil) // setting listening port
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
