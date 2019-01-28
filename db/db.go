@@ -9,6 +9,10 @@ import (
 
 func BuildDB(dbPath string) (*OurDB, error) {
 	// mark the connection as read only!
+
+	// make sure this has been run!
+	// create index idx_lifter_hometown on results(lifter, hometown);
+
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal(err)

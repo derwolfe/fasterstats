@@ -23,11 +23,11 @@ var searchNamesResults = `<!doctype html>
 				Lifter:<input type="string" name="name">
 				<input type="submit" value="">
 			</form>
-		<ul>
-			{{ range .}}
-				<li><a href="results?name={{ .Name }}&hometown={{ .Hometown }}">{{ .Name }} - {{ .Hometown }}</li></a>
-			{{ end }}
-		</ul>
+			<ul>
+				{{ range .}}
+					<li><a href="results?name={{ .Name }}&hometown={{ .Hometown }}">{{ .Name }} - {{ .Hometown }}</li></a>
+				{{ end }}
+			</ul>
 		</div>
 	</body>
 </html>`
@@ -44,11 +44,11 @@ var liftingResults = `<!doctype html>
 				Lifter:<input type="string" name="name">
 				<input type="submit" value="">
 			</form>
-		<ul>
-			{{ range .}}
-				<li>{{ . }}</li>
-			{{ end }}
-		</ul>
+			<ul>
+				{{ range .}}
+					<li>{{ . }}</li>
+				{{ end }}
+			</ul>
 		</div>
 	</body>
 </html>`
@@ -90,13 +90,15 @@ func (a api) search(w http.ResponseWriter, r *http.Request){
 func (a api) results(w http.ResponseWriter, r *http.Request) {
 	names, ok := r.URL.Query()["name"]
 	if !ok || len(names) != 1 {
-		// XXX this should be http error
-		panic("no name")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("400 - Bad Request - Missing/too many name parameter!"))
+		return
 	}
 	hometowns, ok := r.URL.Query()["hometown"]
 	if !ok || len(hometowns) != 1 {
-		// this should be http error
-		panic("no hometown")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("400 - Bad Request - Missing/too many hometown parameter!"))
+		return
 	}
 	found, err := a.db.QueryResults(names[0], hometowns[0])
 	if err != nil {
