@@ -79,7 +79,9 @@ func (a api) search(w http.ResponseWriter, r *http.Request){
 		name := r.FormValue("name")
 		found, err := a.db.QueryNames(name)
 		if err != nil {
-			panic(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("500 - Uh oh"))
+			return
 		}
 		searchNamesResultsTemplate.Execute(w, found)
 		return
@@ -102,7 +104,9 @@ func (a api) results(w http.ResponseWriter, r *http.Request) {
 	}
 	found, err := a.db.QueryResults(names[0], hometowns[0])
 	if err != nil {
-		panic(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Uh oh"))
+		return
 	}
 	liftingResultsTemplate.Execute(w, found)
 }
