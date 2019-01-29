@@ -167,5 +167,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// now compute avg CJ makes. Loop over the results, converting each to a 1 or -1
 	return &rs, nil
 }
