@@ -30,11 +30,11 @@ func TestQueryResults(t *testing.T) {
 	assert.Nil(t, err, "query for names returned an error")
 	assert.NotEmpty(t, lifters, "no names returned")
 
-	results, err := db.QueryResults(lifters[0].Name, lifters[0].Hometown)
+	summary, err := db.QueryResults(lifters[0].Name, lifters[0].Hometown)
 	assert.Nil(t, err, "query for results failed")
 
-	assert.NotEmpty(t, results, "no results for lifter")
-	for _, result := range results {
+	assert.NotEmpty(t, summary.Results, "no results for lifter")
+	for _, result := range summary.Results {
 		// let's make sure we have what we expect
 		fmt.Printf("%v\n", result)
 	}

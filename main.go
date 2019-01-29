@@ -44,6 +44,14 @@ var liftingResults = `<!doctype html>
 				Lifter:<input type="string" name="name" required minlength=3>
 				<input type="submit" value="Search!">
 			</form>
+			<div>
+				<h4>Bests</h4>
+				<ul>
+					<li>CJ: {{ .BestCJ }}</li>
+					<li>Snatch {{ .BestSN }}</li>
+					<li>Total {{ .BestTotal }}</li>
+				</ul>
+			</div>
 			<div class="table-responsive">
             <table class="table table-striped w-auto">
                 <thead>
@@ -63,7 +71,7 @@ var liftingResults = `<!doctype html>
                     </tr>
                 </thead>
                 <tbody>
-                    {{ range . }}
+                    {{ range .Results }}
                     <tr>
                         <td>{{ .Date }}</td>
 						<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>

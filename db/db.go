@@ -28,16 +28,40 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		return nil, err
 	}
 
+	bestCJ, err := db.Prepare(`with bestCJ as (select cj1 from results where lifter = $1 and hometown = $2 UNION select cj2 from results where lifter = $1 and hometown = $2 UNION select cj3 from results where lifter = $1 and hometown = $2) select MAX(cj1) from bestCJ`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	bestSN, err := db.Prepare(`with bestSN as (select sn1 from results where lifter = $1 and hometown = $2 UNION select sn2 from results where lifter = $1 and hometown = $2 UNION select sn3 from results where lifter = $1 and hometown = $2) select MAX(sn1) from bestSN`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	bestTotal, err := db.Prepare(`select MAX(total) from results where lifter = $1 and hometown = $2`)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &OurDB{
 		db:           db,
 		nameQuery:    nameStmt,
 		resultsQuery: resultsStmt,
+		bestCJQuery: bestCJ,
+		bestSNQuery: bestSN,
+		bestTotalQuery: bestTotal,
 	}, nil
 }
 
 func (o *OurDB) Close() {
 	o.nameQuery.Close()
 	o.resultsQuery.Close()
+	o.bestCJQuery.Close()
+	o.bestSNQuery.Close()
+	o.bestTotalQuery.Close()
 	o.db.Close()
 }
 
@@ -62,10 +86,22 @@ type Result struct {
 	URL         string
 }
 
+type ResultsSummary struct {
+	BestCJ decimal.Decimal
+	BestSN decimal.Decimal
+	BestTotal  decimal.Decimal
+	AvgCJMakes decimal.Decimal
+	AvgSNMakes decimal.Decimal
+	Results []Result
+}
+
 type OurDB struct {
 	db           *sql.DB
 	nameQuery    *sql.Stmt
 	resultsQuery *sql.Stmt
+	bestCJQuery  *sql.Stmt
+	bestSNQuery  *sql.Stmt
+	bestTotalQuery *sql.Stmt
 }
 
 func (o *OurDB) QueryNames(name string) ([]Lifter, error) {
@@ -92,13 +128,14 @@ func (o *OurDB) QueryNames(name string) ([]Lifter, error) {
 	return lifters, nil
 }
 
-func (o *OurDB) QueryResults(name, hometown string) ([]Result, error) {
+func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	rows, err := o.resultsQuery.Query(name, hometown)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
+	// load the results
 	var results []Result
 	for rows.Next() {
 		r := Result{}
@@ -112,5 +149,23 @@ func (o *OurDB) QueryResults(name, hometown string) ([]Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return results, nil
+
+	rs := ResultsSummary{Results: results}
+
+	// load the total
+	err = o.bestTotalQuery.QueryRow(name, hometown).Scan(&rs.BestTotal)
+	if err != nil {
+		return nil, err
+	}
+	// load the best SN
+	err = o.bestSNQuery.QueryRow(name, hometown).Scan(&rs.BestSN)
+	if err != nil {
+		return nil, err
+	}
+	// load the best CJ
+	err = o.bestCJQuery.QueryRow(name, hometown).Scan(&rs.BestCJ)
+	if err != nil {
+		return nil, err
+	}
+	return &rs, nil
 }
