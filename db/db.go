@@ -99,8 +99,9 @@ type ResultsSummary struct {
 	BestTotal  decimal.Decimal
 	AvgCJMakes decimal.Decimal
 	AvgSNMakes decimal.Decimal
-	Results []Result
+	Results []*Result
 }
+
 
 type OurDB struct {
 	db           *sql.DB
@@ -143,9 +144,9 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	defer rows.Close()
 
 	// load the results
-	var results []Result
+	var results []*Result
 	for rows.Next() {
-		r := Result{}
+		r := &Result{}
 		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.Weightclass, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.URL)
 		if err != nil {
 			return nil, err
