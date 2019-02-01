@@ -22,27 +22,78 @@ var css = `{{ define "css" }}<style>
 .bestRow { bgcolor: "limegreen"; }
 </style>{{ end }}`
 
-var searchNamesResults = `<!doctype html>
-<html>
-	<head>
-		<title>Lifter finder</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		{{ template "css" }}
-	</head>
-	<body>
-		<div>
-			<form action="/search" method="GET">
-				Lifter:<input type="string" name="name" required minlength=3>
-				<input type="submit" value="Search!">
-			</form>
-			<ul>
-				{{ range .}}
-					<li><a href="results?name={{ .Name }}&hometown={{ .Hometown }}">{{ .Name }} - {{ .Hometown }}</li></a>
-				{{ end }}
-			</ul>
-		</div>
-	</body>
-</html>`
+var searchNamesResults = `{{ define "content" }}<div>
+		<ul>
+			{{ range .}}
+				<li><a href="results?name={{ .Name }}&hometown={{ .Hometown }}">{{ .Name }} - {{ .Hometown }}</li></a>
+			{{ end }}
+		</ul>
+</div>{{ end }}`
+
+var resultsTable = `{{ define "content" }}<div>
+	<h4>Bests</h4>
+	<ul>
+		<li>CJ: {{ .BestCJ }}</li>
+		<li>Snatch {{ .BestSN }}</li>
+		<li>Total {{ .BestTotal }}</li>
+	</ul>
+	<h4>Averages (approx)</h4>
+	<ul>
+		<li>CJ: {{ .AvgCJMakes }}</li>
+		<li>Snatch {{ .AvgSNMakes }}</li>
+	</ul>
+</div>
+<div class="">
+<table class="">
+	<thead>
+		<tr>
+			<th scope="col">Meet Date</th>
+			<th scope="col">Meet</th>
+			<th scope="col">Class</th>
+			<th scope="col">Lifter</th>
+			<th scope="col">Hometown</th>
+			<th scope="col">SN1</th>
+			<th scope="col">SN2</th>
+			<th scope="col">SN3</th>
+			<th scope="col">CJ1</th>
+			<th scope="col">CJ2</th>
+			<th scope="col">CJ3</th>
+			<th scope="col">Total</th>
+			<th scope="col">SNs/3</th>
+			<th scope="col">CJs/3</th>
+		</tr>
+	</thead>
+	<tbody>
+	{{ range .Results }}
+		{{ if .BestResult }}
+		<tr bgcolor="lime">
+		{{ else }}
+		<tr>
+		{{ end }}
+		<td>{{ .Date }}</td>
+			<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
+			<td>{{ .Weightclass }}</td>
+			<td>{{ .Lifter }}</td>
+			<td>{{ .Hometown }}</td>
+			<td>{{ .SN1 }}</td>
+			<td>{{ .SN2 }}</td>
+			<td>{{ .SN3 }}</td>
+			<td>{{ .CJ1 }}</td>
+			<td>{{ .CJ2 }}</td>
+			<td>{{ .CJ3 }}</td>
+			<td>{{ .Total }}</td>
+			<td>{{ .SNSMade }}</td>
+			<td>{{ .CJSMade }}</td>
+		</tr>
+		{{ end }}
+	</tbody>
+</table>
+</div>{{ end }}`
+
+var searchForm = `{{define "searchForm" }}<form action="/search" method="GET">
+	Lifter:<input type="string" name="name" required minlength=3>
+	<input type="submit" value="Search">
+</form>{{ end }}`
 
 var liftingResults = `<!doctype html>
 <html>
@@ -52,70 +103,8 @@ var liftingResults = `<!doctype html>
 		{{ template "css"}}
 	</head>
 	<body>
-		<div>
-			<form action="/search" method="GET">
-				Lifter:<input type="string" name="name" required minlength=3>
-				<input type="submit" value="Search!">
-			</form>
-			<div>
-				<h4>Bests</h4>
-				<ul>
-					<li>CJ: {{ .BestCJ }}</li>
-					<li>Snatch {{ .BestSN }}</li>
-					<li>Total {{ .BestTotal }}</li>
-				</ul>
-				<h4>Averages (approx)</h4>
-				<ul>
-					<li>CJ: {{ .AvgCJMakes }}</li>
-					<li>Snatch {{ .AvgSNMakes }}</li>
-				</ul>
-			</div>
-			<div class="table-responsive">
-            <table class="table table-striped w-auto">
-                <thead>
-                    <tr>
-                        <th scope="col">Meet Date</th>
-                        <th scope="col">Meet</th>
-                        <th scope="col">Class</th>
-                        <th scope="col">Lifter</th>
-                        <th scope="col">Hometown</th>
-                        <th scope="col">SN1</th>
-                        <th scope="col">SN2</th>
-                        <th scope="col">SN3</th>
-                        <th scope="col">CJ1</th>
-                        <th scope="col">CJ2</th>
-                        <th scope="col">CJ3</th>
-						<th scope="col">Total</th>
-						<th scope="col">SNs/3</th>
-						<th scope="col">CJs/3</th>
-                    </tr>
-                </thead>
-                <tbody>
-				{{ range .Results }}
-					{{ if .BestResult }}
-					<tr bgcolor="lime">
-					{{ else }}
-					<tr>
-					{{ end }}
-					<td>{{ .Date }}</td>
-						<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
-                        <td>{{ .Weightclass }}</td>
-                        <td>{{ .Lifter }}</td>
-                        <td>{{ .Hometown }}</td>
-                        <td>{{ .SN1 }}</td>
-                        <td>{{ .SN2 }}</td>
-                        <td>{{ .SN3 }}</td>
-                        <td>{{ .CJ1 }}</td>
-                        <td>{{ .CJ2 }}</td>
-                        <td>{{ .CJ3 }}</td>
-						<td>{{ .Total }}</td>
-						<td>{{ .SNSMade }}</td>
-						<td>{{ .CJSMade }}</td>
-                    </tr>
-                    {{ end }}
-                </tbody>
-            </table>
-		</div>
+		{{ template "searchForm" }}
+		{{ template "content" .}}
 	</body>
 </html>`
 
@@ -128,17 +117,9 @@ var findLiftersForm = `<!doctype html>
 		{{ template "css" }}
 	</head>
 	<body>
-		<form action="/search" method="GET">
-			Lifter:<input type="string" name="name" required minlength=3>
-			<input type="submit" value="">
-		</form>
+		{{ template "searchForm" }}
 	</body>
 </html>`
-
-var cssTemplate = template.Must(template.New("css").Parse(css))
-var findLiftersTemplate = template.Must(template.New("findLifters").Parse(findLiftersForm))
-var searchNamesResultsTemplate = template.Must(template.New("namesFound").Parse(searchNamesResults))
-var liftingResultsTemplate = template.Must(template.New("resultsFound").Parse(liftingResults))
 
 func (a api) search(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -157,7 +138,15 @@ func (a api) search(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("500 - Uh oh"))
 			return
 		}
-		searchNamesResultsTemplate.Execute(w, found)
+		tmpl := template.Must(template.New("liftingResults").Parse(liftingResults))
+		tmpl.Parse(searchForm)
+		tmpl.Parse(css)
+		tmpl.Parse(searchNamesResults)
+
+		if err := tmpl.Execute(w, found); err != nil {
+			log.Printf("%v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -165,6 +154,8 @@ func (a api) searchForm(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		tmpl := template.Must(template.New("findLiftersForm").Parse(findLiftersForm))
 		tmpl.Parse(css)
+		tmpl.Parse(searchForm)
+		tmpl.Parse(searchNamesResults)
 
 		if err := tmpl.Execute(w, nil); err != nil {
 			log.Printf("%v", err)
@@ -193,7 +184,15 @@ func (a api) results(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("500 - Uh oh"))
 			return
 		}
-		liftingResultsTemplate.ExecuteTemplate(w, "css", found)
+		tmpl := template.Must(template.New("liftingResults").Parse(liftingResults))
+		tmpl.Parse(css)
+		tmpl.Parse(searchForm)
+		tmpl.Parse(resultsTable)
+
+		if err := tmpl.Execute(w, found); err != nil {
+			log.Printf("%v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
