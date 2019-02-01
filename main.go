@@ -67,7 +67,9 @@ var liftingResults = `<!doctype html>
                         <th scope="col">CJ1</th>
                         <th scope="col">CJ2</th>
                         <th scope="col">CJ3</th>
-                        <th scope="col">Total</th>
+						<th scope="col">Total</th>
+						<th scope="col">SNs/3</th>
+						<th scope="col">CJs/3</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,7 +86,9 @@ var liftingResults = `<!doctype html>
                         <td>{{ .CJ1 }}</td>
                         <td>{{ .CJ2 }}</td>
                         <td>{{ .CJ3 }}</td>
-                        <td>{{ .Total }}</td>
+						<td>{{ .Total }}</td>
+						<td>{{ .SNSMade }}</td>
+						<td>{{ .CJSMade }}</td>
                     </tr>
                     {{ end }}
                 </tbody>
