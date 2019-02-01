@@ -138,7 +138,6 @@ func (a api) search(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		searchNamesResultsTemplate.Execute(w, found)
-		return
 	}
 }
 
@@ -149,25 +148,27 @@ func (a api) searchForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a api) results(w http.ResponseWriter, r *http.Request) {
-	names, ok := r.URL.Query()["name"]
-	if !ok || len(names) != 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("400 - Bad Request - Missing/too many name parameter!"))
-		return
+	if r.Method == "GET" {
+		names, ok := r.URL.Query()["name"]
+		if !ok || len(names) != 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - Bad Request - Missing/too many name parameter!"))
+			return
+		}
+		hometowns, ok := r.URL.Query()["hometown"]
+		if !ok || len(hometowns) != 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - Bad Request - Missing/too many hometown parameter!"))
+			return
+		}
+		found, err := a.db.QueryResults(names[0], hometowns[0])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("500 - Uh oh"))
+			return
+		}
+		liftingResultsTemplate.Execute(w, found)
 	}
-	hometowns, ok := r.URL.Query()["hometown"]
-	if !ok || len(hometowns) != 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("400 - Bad Request - Missing/too many hometown parameter!"))
-		return
-	}
-	found, err := a.db.QueryResults(names[0], hometowns[0])
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("500 - Uh oh"))
-		return
-	}
-	liftingResultsTemplate.Execute(w, found)
 }
 
 func main() {
