@@ -78,9 +78,13 @@ var liftingResults = `<!doctype html>
                     </tr>
                 </thead>
                 <tbody>
-                    {{ range .Results }}
-                    <tr>
-                        <td>{{ .Date }}</td>
+				{{ range .Results }}
+					{{ if .BestResult }}
+					<tr bgcolor="lime">
+					{{ else }}
+					<tr>
+					{{ end }}
+					<td>{{ .Date }}</td>
 						<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
                         <td>{{ .Weightclass }}</td>
                         <td>{{ .Lifter }}</td>

@@ -86,11 +86,18 @@ type Result struct {
 	URL         string
 	CJSMade 	int
 	SNSMade		int
+	// this will be filled in by a later method
+	BestCJ		decimal.Decimal
+	BestSN		decimal.Decimal
+	BestResult	bool
 }
 
 func (r *Result) missesToMakes() {
 	r.CJSMade = max(0, r.CJ1.Sign()) + max(0, r.CJ2.Sign()) + max(0, r.CJ3.Sign())
 	r.SNSMade = max(0, r.SN1.Sign()) + max(0, r.SN2.Sign()) + max(0, r.SN3.Sign())
+
+	r.BestCJ = maxDec(maxDec(r.CJ1, r.CJ2), r.CJ3)
+	r.BestSN = maxDec(maxDec(r.SN1, r.SN2), r.SN3)
 }
 
 type ResultsSummary struct {
@@ -101,7 +108,6 @@ type ResultsSummary struct {
 	AvgSNMakes decimal.Decimal
 	Results []*Result
 }
-
 
 type OurDB struct {
 	db           *sql.DB
@@ -153,6 +159,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		}
 
 		// compute misses an makes
+		r.BestResult = false
 		r.missesToMakes()
 		results = append(results, r)
 	}
@@ -179,7 +186,6 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		return nil, err
 	}
 	// now compute avg CJ makes. Loop over the results, converting each to a 1 or -1
-
 	totalCjs := decimal.Zero
 	totalSns := decimal.Zero
 	numCjs := decimal.Zero
@@ -211,6 +217,15 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 			totalSns = r.SN3.Add(totalSns)
 			numSns = numSns.Add(one)
 		}
+		if r.BestCJ.Equal(rs.BestCJ) {
+			r.BestResult = true
+		}
+		if r.BestSN.Equal(rs.BestSN) {
+			r.BestResult = true
+		}
+		if r.Total.Equal(rs.BestTotal) {
+			r.BestResult = true
+		}
 	}
 	rs.AvgCJMakes = totalCjs.DivRound(numCjs, 2)
 	rs.AvgSNMakes = totalSns.DivRound(numSns, 2)
@@ -219,6 +234,13 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 
 func max(x, y int) int {
     if x > y {
+        return x
+    }
+    return y
+}
+
+func maxDec(x, y decimal.Decimal) decimal.Decimal {
+    if x.GreaterThan(y) {
         return x
     }
     return y
