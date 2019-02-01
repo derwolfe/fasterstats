@@ -51,6 +51,11 @@ var liftingResults = `<!doctype html>
 					<li>Snatch {{ .BestSN }}</li>
 					<li>Total {{ .BestTotal }}</li>
 				</ul>
+				<h4>Averages (approx)</h4>
+				<ul>
+					<li>CJ: {{ .AvgCJMakes }}</li>
+					<li>Snatch {{ .AvgSNMakes }}</li>
+				</ul>
 			</div>
 			<div class="table-responsive">
             <table class="table table-striped w-auto">

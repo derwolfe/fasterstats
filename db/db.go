@@ -178,8 +178,42 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	// now compute avg CJ makes. Loop over the results, converting each to a 1 or -1
+
+	totalCjs := decimal.Zero
+	totalSns := decimal.Zero
+	numCjs := decimal.Zero
+	numSns := decimal.Zero
+	one := decimal.New(int64(1), 0)
+
+	for _, r := range results {
+		if r.CJ1.GreaterThan(decimal.Zero) {
+			totalCjs = r.CJ1.Add(totalCjs)
+			numCjs = numCjs.Add(one)
+		}
+		if r.CJ2.GreaterThan(decimal.Zero) {
+			totalCjs = r.CJ2.Add(totalCjs)
+			numCjs = numCjs.Add(one)
+		}
+		if r.CJ3.GreaterThan(decimal.Zero) {
+			totalCjs = r.CJ3.Add(totalCjs)
+			numCjs = numCjs.Add(one)
+		}
+		if r.SN1.GreaterThan(decimal.Zero) {
+			totalSns = r.SN1.Add(totalSns)
+			numSns = numSns.Add(one)
+		}
+		if r.SN2.GreaterThan(decimal.Zero) {
+			totalSns = r.SN2.Add(totalSns)
+			numSns = numSns.Add(one)
+		}
+		if r.SN3.GreaterThan(decimal.Zero) {
+			totalSns = r.SN3.Add(totalSns)
+			numSns = numSns.Add(one)
+		}
+	}
+	rs.AvgCJMakes = totalCjs.DivRound(numCjs, 2)
+	rs.AvgSNMakes = totalSns.DivRound(numSns, 2)
 	return &rs, nil
 }
 
