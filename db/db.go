@@ -84,6 +84,13 @@ type Result struct {
 	SN3         decimal.Decimal
 	Total       decimal.Decimal
 	URL         string
+	CJSMade 	int
+	SNSMade		int
+}
+
+func (r *Result) missesToMakes() {
+	r.CJSMade = max(0, r.CJ1.Sign()) + max(0, r.CJ2.Sign()) + max(0, r.CJ3.Sign())
+	r.SNSMade = max(0, r.SN1.Sign()) + max(0, r.SN2.Sign()) + max(0, r.SN3.Sign())
 }
 
 type ResultsSummary struct {
@@ -143,6 +150,9 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// compute misses an makes
+		r.missesToMakes()
 		results = append(results, r)
 	}
 	err = rows.Err()
@@ -170,4 +180,11 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 
 	// now compute avg CJ makes. Loop over the results, converting each to a 1 or -1
 	return &rs, nil
+}
+
+func max(x, y int) int {
+    if x > y {
+        return x
+    }
+    return y
 }
