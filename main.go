@@ -19,7 +19,7 @@ var searchNamesResults = `<!doctype html>
 	</head>
 	<body>
 		<div>
-			<form action="/search" method="post">
+			<form action="/search" method="GET">
 				Lifter:<input type="string" name="name" required minlength=3>
 				<input type="submit" value="Search!">
 			</form>
@@ -40,7 +40,7 @@ var liftingResults = `<!doctype html>
 	</head>
 	<body>
 		<div>
-			<form action="/search" method="post">
+			<form action="/search" method="GET">
 				Lifter:<input type="string" name="name" required minlength=3>
 				<input type="submit" value="Search!">
 			</form>
@@ -104,16 +104,15 @@ var findLiftersForm = []byte(`<!doctype html>
     	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	</head>
 	<body>
-		<form action="/search" method="post">
+		<form action="/search" method="GET">
 			Lifter:<input type="string" name="name" required minlength=3>
 			<input type="submit" value="">
 		</form>
 	</body>
 </html>`)
 
-func (a api) search(w http.ResponseWriter, r *http.Request){
-	// display a form, if a post, display results
-	if r.Method == "POST" {
+func (a api) search(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
 		r.ParseForm()
 		// this needs validation! should be characters, maybe a digit, spaces
 		name := r.FormValue("name")
@@ -132,7 +131,13 @@ func (a api) search(w http.ResponseWriter, r *http.Request){
 		searchNamesResultsTemplate.Execute(w, found)
 		return
 	}
-	w.Write(findLiftersForm)
+}
+
+
+func (a api) searchForm(w http.ResponseWriter, r *http.Request){
+	if r.Method == "GET" {
+		w.Write(findLiftersForm)
+	}
 }
 
 func (a api) results(w http.ResponseWriter, r *http.Request) {
@@ -164,11 +169,13 @@ func main() {
 	}
 	api := api{db: db}
 
+	http.HandleFunc("/", api.searchForm)
 	http.HandleFunc("/search", api.search)
 	http.HandleFunc("/results", api.results)
 
 	log.Println("Starting on :9090")
 	err = http.ListenAndServe(":9090", nil) // setting listening port
+
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
