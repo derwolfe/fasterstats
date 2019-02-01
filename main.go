@@ -11,11 +11,22 @@ type api struct {
 	db *db.OurDB
 }
 
+var css = `{{ define "css" }}
+<style>
+.Aligner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+</style>
+{{ end}}`
+
 var searchNamesResults = `<!doctype html>
 <html>
 	<head>
 		<title>Lifter finder</title>
-    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		{{ template "css" }}
 	</head>
 	<body>
 		<div>
@@ -36,7 +47,8 @@ var liftingResults = `<!doctype html>
 <html>
 	<head>
 		<title>Lifter finder</title>
-    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		{{ template "css"}}
 	</head>
 	<body>
 		<div>
@@ -106,15 +118,13 @@ var liftingResults = `<!doctype html>
 	</body>
 </html>`
 
-var searchNamesResultsTemplate = template.Must(template.New("names found").Parse(searchNamesResults))
-var liftingResultsTemplate = template.Must(template.New("results found").Parse(liftingResults))
-
 // this should be used inside of another template, not sure how to do that now
-var findLiftersForm = []byte(`<!doctype html>
+var findLiftersForm =`<!doctype html>
 <html>
 	<head>
 		<title>Lifter finder</title>
-    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		{{ template "css" }}
 	</head>
 	<body>
 		<form action="/search" method="GET">
@@ -122,7 +132,13 @@ var findLiftersForm = []byte(`<!doctype html>
 			<input type="submit" value="">
 		</form>
 	</body>
-</html>`)
+</html>`
+
+var cssTemplate = template.Must(template.New("css").Parse(css))
+var findLiftersTemplate = template.Must(template.New("findLifters").Parse(findLiftersForm))
+var searchNamesResultsTemplate = template.Must(template.New("namesFound").Parse(searchNamesResults))
+var liftingResultsTemplate = template.Must(template.New("resultsFound").Parse(liftingResults))
+
 
 func (a api) search(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -147,7 +163,7 @@ func (a api) search(w http.ResponseWriter, r *http.Request) {
 
 func (a api) searchForm(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		w.Write(findLiftersForm)
+		findLiftersTemplate.ExecuteTemplate(w, "css", nil)
 	}
 }
 
@@ -171,7 +187,7 @@ func (a api) results(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("500 - Uh oh"))
 			return
 		}
-		liftingResultsTemplate.Execute(w, found)
+		liftingResultsTemplate.ExecuteTemplate(w, "css", found)
 	}
 }
 
