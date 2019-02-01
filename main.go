@@ -1,10 +1,10 @@
 package main
 
 import (
+	"gitlab.com/derwolfe/faststats/db"
+	"html/template"
 	"log"
 	"net/http"
-	"html/template"
-	"gitlab.com/derwolfe/faststats/db"
 )
 
 type api struct {
@@ -137,8 +137,7 @@ func (a api) search(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-func (a api) searchForm(w http.ResponseWriter, r *http.Request){
+func (a api) searchForm(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		w.Write(findLiftersForm)
 	}
