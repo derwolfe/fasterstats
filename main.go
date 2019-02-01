@@ -1,25 +1,26 @@
 package main
 
 import (
-	"gitlab.com/derwolfe/faststats/db"
 	"html/template"
 	"log"
 	"net/http"
+
+	"gitlab.com/derwolfe/faststats/db"
 )
 
 type api struct {
 	db *db.OurDB
 }
 
-var css = `{{ define "css" }}
-<style>
+var css = `{{ define "css" }}<style>
 .Aligner {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
-</style>
-{{ end}}`
+
+.bestRow { bgcolor: "limegreen"; }
+</style>{{ end }}`
 
 var searchNamesResults = `<!doctype html>
 <html>
@@ -119,7 +120,7 @@ var liftingResults = `<!doctype html>
 </html>`
 
 // this should be used inside of another template, not sure how to do that now
-var findLiftersForm =`<!doctype html>
+var findLiftersForm = `<!doctype html>
 <html>
 	<head>
 		<title>Lifter finder</title>
@@ -138,7 +139,6 @@ var cssTemplate = template.Must(template.New("css").Parse(css))
 var findLiftersTemplate = template.Must(template.New("findLifters").Parse(findLiftersForm))
 var searchNamesResultsTemplate = template.Must(template.New("namesFound").Parse(searchNamesResults))
 var liftingResultsTemplate = template.Must(template.New("resultsFound").Parse(liftingResults))
-
 
 func (a api) search(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -163,7 +163,13 @@ func (a api) search(w http.ResponseWriter, r *http.Request) {
 
 func (a api) searchForm(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		findLiftersTemplate.ExecuteTemplate(w, "css", nil)
+		tmpl := template.Must(template.New("findLiftersForm").Parse(findLiftersForm))
+		tmpl.Parse(css)
+
+		if err := tmpl.Execute(w, nil); err != nil {
+			log.Printf("%v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
