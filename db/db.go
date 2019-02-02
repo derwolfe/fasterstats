@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/shopspring/decimal"
+	"github.com/pkg/errors"
 	"log"
 )
 
@@ -170,6 +171,11 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		return nil, err
 	}
 
+
+	if len(results) == 0 {
+		return nil, errors.New("No results")
+	}
+
 	rs := ResultsSummary{Results: results}
 
 	// load the total
@@ -231,10 +237,10 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	}
 	rs.AvgCJMakes = totalCjs.DivRound(numCjs, 2)
 	rs.AvgSNMakes = totalSns.DivRound(numSns, 2)
-	if len(results) > 0 {
-		rs.Lifter = results[0].Lifter
-		rs.Hometown = results[0].Hometown
-	}
+	// we shouldn't get here if there are no results
+	rs.Lifter = results[0].Lifter
+	rs.Hometown = results[0].Hometown
+
 	return &rs, nil
 }
 
