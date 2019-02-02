@@ -169,6 +169,7 @@ func (a api) results(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("400 - Bad Request - Missing/too many hometown parameter!"))
 			return
 		}
+		// this will produce errors! what if the lifter has no results and someone modifies the search query
 		found, err := a.db.QueryResults(names[0], hometowns[0])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
