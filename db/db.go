@@ -101,6 +101,8 @@ func (r *Result) missesToMakes() {
 }
 
 type ResultsSummary struct {
+	Lifter string
+	Hometown string
 	BestCJ decimal.Decimal
 	BestSN decimal.Decimal
 	BestTotal  decimal.Decimal
@@ -229,6 +231,10 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	}
 	rs.AvgCJMakes = totalCjs.DivRound(numCjs, 2)
 	rs.AvgSNMakes = totalSns.DivRound(numSns, 2)
+	if len(results) > 0 {
+		rs.Lifter = results[0].Lifter
+		rs.Hometown = results[0].Hometown
+	}
 	return &rs, nil
 }
 

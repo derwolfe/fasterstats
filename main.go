@@ -9,21 +9,15 @@ import (
 )
 
 type api struct {
-	db *db.OurDB
-	searchPage	*template.Template
-	namesPage *template.Template
+	db          *db.OurDB
+	searchPage  *template.Template
+	namesPage   *template.Template
 	liftersPage *template.Template
 }
 
-var css = `{{ define "css" }}<style>
-.Aligner {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.bestRow { bgcolor: "limegreen"; }
-</style>{{ end }}`
+var css = `{{ define "css" }}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+{{ end }}`
 
 var searchNamesResults = `{{ define "content" }}<div>
 		<ul>
@@ -34,6 +28,8 @@ var searchNamesResults = `{{ define "content" }}<div>
 </div>{{ end }}`
 
 var resultsTable = `{{ define "content" }}<div>
+	<h3>{{ .Lifter }}</h3>
+	<h4>{{ .Hometown }}
 	<h4>Bests</h4>
 	<ul>
 		<li>CJ: {{ .BestCJ }}</li>
@@ -46,15 +42,13 @@ var resultsTable = `{{ define "content" }}<div>
 		<li>Snatch {{ .AvgSNMakes }}</li>
 	</ul>
 </div>
-<div class="">
-<table class="">
-	<thead>
+<div class="table">
+<table class="table table-sm">
+	<thead class="thead-light">
 		<tr>
 			<th scope="col">Meet Date</th>
 			<th scope="col">Meet</th>
 			<th scope="col">Class</th>
-			<th scope="col">Lifter</th>
-			<th scope="col">Hometown</th>
 			<th scope="col">SN1</th>
 			<th scope="col">SN2</th>
 			<th scope="col">SN3</th>
@@ -66,18 +60,16 @@ var resultsTable = `{{ define "content" }}<div>
 			<th scope="col">CJs/3</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody class="table-striped">
 	{{ range .Results }}
 		{{ if .BestResult }}
 		<tr bgcolor="lime">
 		{{ else }}
 		<tr>
 		{{ end }}
-		<td>{{ .Date }}</td>
+			<td scope="row">{{ .Date }}</td>
 			<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
 			<td>{{ .Weightclass }}</td>
-			<td>{{ .Lifter }}</td>
-			<td>{{ .Hometown }}</td>
 			<td>{{ .SN1 }}</td>
 			<td>{{ .SN2 }}</td>
 			<td>{{ .SN3 }}</td>
@@ -106,8 +98,10 @@ var liftingResults = `<!doctype html>
 		{{ template "css"}}
 	</head>
 	<body>
-		{{ template "searchForm" }}
-		{{ template "content" .}}
+		<div class="container">
+			{{ template "searchForm" }}
+			{{ template "content" .}}
+		</div>
 	</body>
 </html>`
 
@@ -120,7 +114,9 @@ var findLiftersForm = `<!doctype html>
 		{{ template "css" }}
 	</head>
 	<body>
-		{{ template "searchForm" }}
+		<div class="container">
+			{{ template "searchForm" }}
+		</div>
 	</body>
 </html>`
 
@@ -131,6 +127,7 @@ func (a api) search(w http.ResponseWriter, r *http.Request) {
 		name := r.FormValue("name")
 		// this could be allowed and use pagination
 		if len(name) < 3 {
+			// this should be better!
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("400 - Search name must be greater than 3 characters"))
 			return
@@ -186,8 +183,8 @@ func (a api) results(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func newAPI(db *db.OurDB) *api{
-	//
+func newAPI(db *db.OurDB) *api {
+	// results
 	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
 	lifts.Parse(css)
 	lifts.Parse(searchForm)
