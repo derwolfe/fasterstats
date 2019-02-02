@@ -85,10 +85,14 @@ var resultsTable = `{{ define "content" }}<div>
 </table>
 </div>{{ end }}`
 
-var searchForm = `{{define "searchForm" }}<form action="/search" method="GET">
-	Lifter:<input type="string" name="name" required minlength=3>
-	<input type="submit" value="Search">
-</form>{{ end }}`
+var searchForm = `{{define "searchForm" }}
+<nav class="navbar navbar-light bg-light">
+	<a class="navbar-brand">Lifter stats</a>
+	<form class="form-inline" action="/search" method="GET">
+		<input class="form-control mr-sm-2" name="name" type="search" placeholder="Search" aria-label="Search" required minlength=3>
+		<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+	</form>
+</nav>{{ end }}`
 
 var liftingResults = `<!doctype html>
 <html>
