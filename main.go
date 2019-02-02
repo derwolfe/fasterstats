@@ -122,7 +122,9 @@ var findLiftersForm = `<!doctype html>
 		{{ template "css" }}
 	</head>
 	<body>
+		<div class="Aligner">
 		{{ template "searchForm" }}
+		</div>
 	</body>
 </html>`
 
