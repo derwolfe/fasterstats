@@ -207,7 +207,7 @@ func newAPI(db *db.OurDB) *api {
 }
 
 func main() {
-	db, err := db.BuildDB("./results.db")
+	db, err := db.BuildDB("./results.db?_query_only=1")
 	if err != nil {
 		log.Fatal(err)
 	}
