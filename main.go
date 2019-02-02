@@ -10,6 +10,9 @@ import (
 
 type api struct {
 	db *db.OurDB
+	searchPage	*template.Template
+	namesPage *template.Template
+	liftersPage *template.Template
 }
 
 var css = `{{ define "css" }}<style>
@@ -140,12 +143,8 @@ func (a api) search(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("500 - Uh oh"))
 			return
 		}
-		tmpl := template.Must(template.New("liftingResults").Parse(liftingResults))
-		tmpl.Parse(searchForm)
-		tmpl.Parse(css)
-		tmpl.Parse(searchNamesResults)
 
-		if err := tmpl.Execute(w, found); err != nil {
+		if err := a.namesPage.Execute(w, found); err != nil {
 			log.Printf("%v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -154,12 +153,7 @@ func (a api) search(w http.ResponseWriter, r *http.Request) {
 
 func (a api) searchForm(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		tmpl := template.Must(template.New("findLiftersForm").Parse(findLiftersForm))
-		tmpl.Parse(css)
-		tmpl.Parse(searchForm)
-		tmpl.Parse(searchNamesResults)
-
-		if err := tmpl.Execute(w, nil); err != nil {
+		if err := a.searchPage.Execute(w, nil); err != nil {
 			log.Printf("%v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -186,16 +180,34 @@ func (a api) results(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("500 - Uh oh"))
 			return
 		}
-		tmpl := template.Must(template.New("liftingResults").Parse(liftingResults))
-		tmpl.Parse(css)
-		tmpl.Parse(searchForm)
-		tmpl.Parse(resultsTable)
-
-		if err := tmpl.Execute(w, found); err != nil {
+		// lifts
+		if err := a.liftersPage.Execute(w, found); err != nil {
 			log.Printf("%v", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+func newAPI(db *db.OurDB) *api{
+	//
+	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
+	lifts.Parse(css)
+	lifts.Parse(searchForm)
+	lifts.Parse(resultsTable)
+
+	// names
+	names := template.Must(template.New("liftingResults").Parse(liftingResults))
+	names.Parse(searchForm)
+	names.Parse(css)
+	names.Parse(searchNamesResults)
+
+	// search form
+	search := template.Must(template.New("findLiftersForm").Parse(findLiftersForm))
+	search.Parse(css)
+	search.Parse(searchForm)
+	search.Parse(searchNamesResults)
+
+	return &api{db: db, searchPage: search, namesPage: names, liftersPage: lifts}
 }
 
 func main() {
@@ -203,7 +215,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	api := api{db: db}
+	api := newAPI(db)
 
 	http.HandleFunc("/", api.searchForm)
 	http.HandleFunc("/search", api.search)
