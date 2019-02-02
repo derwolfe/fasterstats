@@ -106,10 +106,8 @@ var liftingResults = `<!doctype html>
 		{{ template "css"}}
 	</head>
 	<body>
-		<div class="Aligner">
 		{{ template "searchForm" }}
 		{{ template "content" .}}
-		</div>
 	</body>
 </html>`
 
@@ -122,9 +120,7 @@ var findLiftersForm = `<!doctype html>
 		{{ template "css" }}
 	</head>
 	<body>
-		<div class="Aligner">
 		{{ template "searchForm" }}
-		</div>
 	</body>
 </html>`
 
