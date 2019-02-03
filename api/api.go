@@ -8,7 +8,8 @@ import (
 	"gitlab.com/derwolfe/faststats/db"
 )
 
-type Api struct {
+// API private struct for shared state.
+type API struct {
 	db          *db.OurDB
 	searchPage  *template.Template
 	namesPage   *template.Template
@@ -16,7 +17,7 @@ type Api struct {
 }
 
 // NewAPI returns an api that can be used to process http requests
-func NewAPI(db *db.OurDB) *Api {
+func NewAPI(db *db.OurDB) *API {
 	// results
 	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
 	lifts.Parse(css)
@@ -35,7 +36,73 @@ func NewAPI(db *db.OurDB) *Api {
 	search.Parse(searchForm)
 	search.Parse(searchNamesResults)
 
-	return &Api{db: db, searchPage: search, namesPage: names, liftersPage: lifts}
+	return &API{db: db, searchPage: search, namesPage: names, liftersPage: lifts}
+}
+
+// Search parses query parameters for name and returns a list of names
+func (a API) Search(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		r.ParseForm()
+		// this needs validation! should be characters, maybe a digit, spaces
+		name := r.FormValue("name")
+		// this could be allowed and use pagination
+		if len(name) < 3 {
+			// this should be better!
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("400 - Search name must be greater than 3 characters"))
+			return
+		}
+		found, err := a.db.QueryNames(name)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("500 - Uh oh"))
+			return
+		}
+
+		if err := a.namesPage.Execute(w, found); err != nil {
+			log.Printf("%v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+// SearchForm is the landing page and displays the search form.
+func (a API) SearchForm(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		if err := a.searchPage.Execute(w, nil); err != nil {
+			log.Printf("%v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+func (a API) Results(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		names, ok := r.URL.Query()["name"]
+		if !ok || len(names) != 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - Bad Request - Missing/too many name parameter!"))
+			return
+		}
+		hometowns, ok := r.URL.Query()["hometown"]
+		if !ok || len(hometowns) != 1 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - Bad Request - Missing/too many hometown parameter!"))
+			return
+		}
+		// this will produce errors! what if the lifter has no results and someone modifies the search query
+		found, err := a.db.QueryResults(names[0], hometowns[0])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("500 - Uh oh"))
+			return
+		}
+		// lifts
+		if err := a.liftersPage.Execute(w, found); err != nil {
+			log.Printf("%v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
 }
 
 var css = `{{ define "css" }}
@@ -146,69 +213,4 @@ var findLiftersForm = `<!doctype html>
 		</div>
 	</body>
 </html>`
-
-
-func (a Api) Search(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		r.ParseForm()
-		// this needs validation! should be characters, maybe a digit, spaces
-		name := r.FormValue("name")
-		// this could be allowed and use pagination
-		if len(name) < 3 {
-			// this should be better!
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("400 - Search name must be greater than 3 characters"))
-			return
-		}
-		found, err := a.db.QueryNames(name)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("500 - Uh oh"))
-			return
-		}
-
-		if err := a.namesPage.Execute(w, found); err != nil {
-			log.Printf("%v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-}
-
-func (a Api) SearchForm(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		if err := a.searchPage.Execute(w, nil); err != nil {
-			log.Printf("%v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-}
-
-func (a Api) Results(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		names, ok := r.URL.Query()["name"]
-		if !ok || len(names) != 1 {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("400 - Bad Request - Missing/too many name parameter!"))
-			return
-		}
-		hometowns, ok := r.URL.Query()["hometown"]
-		if !ok || len(hometowns) != 1 {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("400 - Bad Request - Missing/too many hometown parameter!"))
-			return
-		}
-		// this will produce errors! what if the lifter has no results and someone modifies the search query
-		found, err := a.db.QueryResults(names[0], hometowns[0])
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("500 - Uh oh"))
-			return
-		}
-		// lifts
-		if err := a.liftersPage.Execute(w, found); err != nil {
-			log.Printf("%v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-}
 
