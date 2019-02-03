@@ -213,4 +213,3 @@ var findLiftersForm = `<!doctype html>
 		</div>
 	</body>
 </html>`
-

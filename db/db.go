@@ -3,8 +3,8 @@ package db
 import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/shopspring/decimal"
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 	"log"
 )
 
@@ -48,11 +48,11 @@ func BuildDB(dbPath string) (*OurDB, error) {
 	}
 
 	return &OurDB{
-		db:           db,
-		nameQuery:    nameStmt,
-		resultsQuery: resultsStmt,
-		bestCJQuery: bestCJ,
-		bestSNQuery: bestSN,
+		db:             db,
+		nameQuery:      nameStmt,
+		resultsQuery:   resultsStmt,
+		bestCJQuery:    bestCJ,
+		bestSNQuery:    bestSN,
 		bestTotalQuery: bestTotal,
 	}, nil
 }
@@ -85,12 +85,12 @@ type Result struct {
 	SN3         decimal.Decimal
 	Total       decimal.Decimal
 	URL         string
-	CJSMade 	int
-	SNSMade		int
+	CJSMade     int
+	SNSMade     int
 	// this will be filled in by a later method
-	BestCJ		decimal.Decimal
-	BestSN		decimal.Decimal
-	BestResult	bool
+	BestCJ     decimal.Decimal
+	BestSN     decimal.Decimal
+	BestResult bool
 }
 
 func (r *Result) missesToMakes() {
@@ -102,22 +102,22 @@ func (r *Result) missesToMakes() {
 }
 
 type ResultsSummary struct {
-	Lifter string
-	Hometown string
-	BestCJ decimal.Decimal
-	BestSN decimal.Decimal
+	Lifter     string
+	Hometown   string
+	BestCJ     decimal.Decimal
+	BestSN     decimal.Decimal
 	BestTotal  decimal.Decimal
 	AvgCJMakes decimal.Decimal
 	AvgSNMakes decimal.Decimal
-	Results []*Result
+	Results    []*Result
 }
 
 type OurDB struct {
-	db           *sql.DB
-	nameQuery    *sql.Stmt
-	resultsQuery *sql.Stmt
-	bestCJQuery  *sql.Stmt
-	bestSNQuery  *sql.Stmt
+	db             *sql.DB
+	nameQuery      *sql.Stmt
+	resultsQuery   *sql.Stmt
+	bestCJQuery    *sql.Stmt
+	bestSNQuery    *sql.Stmt
 	bestTotalQuery *sql.Stmt
 }
 
@@ -170,7 +170,6 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	if err != nil {
 		return nil, err
 	}
-
 
 	if len(results) == 0 {
 		return nil, errors.New("No results")
@@ -245,15 +244,15 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 }
 
 func max(x, y int) int {
-    if x > y {
-        return x
-    }
-    return y
+	if x > y {
+		return x
+	}
+	return y
 }
 
 func maxDec(x, y decimal.Decimal) decimal.Decimal {
-    if x.GreaterThan(y) {
-        return x
-    }
-    return y
+	if x.GreaterThan(y) {
+		return x
+	}
+	return y
 }

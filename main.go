@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"gitlab.com/derwolfe/faststats/db"
 	"gitlab.com/derwolfe/faststats/api"
+	"gitlab.com/derwolfe/faststats/db"
 )
 
 func main() {
