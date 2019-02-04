@@ -123,6 +123,7 @@ type OurDB struct {
 }
 
 func (o *OurDB) QueryNames(name string) ([]Lifter, error) {
+	log.Printf("name: %v", name)
 	name = strings.Replace(name, " ", "%", -1)
 	q := "%" + name + "%"
 	rows, err := o.nameQuery.Query(q)
@@ -149,6 +150,7 @@ func (o *OurDB) QueryNames(name string) ([]Lifter, error) {
 }
 
 func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
+	log.Printf("name: %v, hometown: %v", name, hometown)
 	rows, err := o.resultsQuery.Query(name, hometown)
 	if err != nil {
 		return nil, err
