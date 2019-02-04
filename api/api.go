@@ -110,11 +110,19 @@ var css = `{{ define "css" }}
 {{ end }}`
 
 var searchNamesResults = `{{ define "content" }}<div>
+	{{ if eq (len .) 0 }}
+		<p>No names found</p>
+	{{ end }}
+	{{ if gt (len .) 50 }}
+		<p>Too many results, please provide more letters</p>
+	{{ end }}
+	{{ if and (gt (len .) 0) (lt (len .) 50) }}
 		<ul>
 			{{ range .}}
 				<li><a href="results?name={{ .Name }}&hometown={{ .Hometown }}">{{ .Name }} - {{ .Hometown }}</li></a>
 			{{ end }}
 		</ul>
+	{{ end }}
 </div>{{ end }}`
 
 var resultsTable = `{{ define "content" }}<div>
