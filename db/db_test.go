@@ -51,12 +51,11 @@ func TestQueryResultsLikeReplace(t *testing.T) {
 	assert.Nil(t, err, "query for names returned an error")
 	assert.NotEmpty(t, lifters, "no names returned")
 
-	summary, err := db.QueryResults(lifters[0].Name, lifters[0].Hometown)
-	assert.Nil(t, err, "query for results failed")
-
-	assert.NotEmpty(t, summary.Results, "no results for lifter")
-	for _, result := range summary.Results {
-		// let's make sure we have what we expect
-		fmt.Printf("%v\n", result)
+	pass := false
+	for _, l := range lifters {
+		if l.Name == "Jessie Bradley" {
+			pass = true
+		}
 	}
+	assert.True(t, pass, "lifter not found")
 }
