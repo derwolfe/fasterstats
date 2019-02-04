@@ -1,6 +1,7 @@
 package db
 
 import (
+	"strings"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
@@ -122,7 +123,9 @@ type OurDB struct {
 }
 
 func (o *OurDB) QueryNames(name string) ([]Lifter, error) {
-	rows, err := o.nameQuery.Query("%" + name + "%")
+	name = strings.Replace(name, " ", "%", -1)
+	q := "%" + name + "%"
+	rows, err := o.nameQuery.Query(q)
 	if err != nil {
 		return nil, err
 	}
