@@ -60,7 +60,7 @@ func (a API) Search(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := a.namesPage.Execute(w, found); err != nil {
-			log.Printf("%v", err)
+			log.Printf("%v\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
@@ -70,7 +70,7 @@ func (a API) Search(w http.ResponseWriter, r *http.Request) {
 func (a API) SearchForm(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		if err := a.searchPage.Execute(w, nil); err != nil {
-			log.Printf("%v", err)
+			log.Printf("%v\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
@@ -99,7 +99,7 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 		}
 		// lifts
 		if err := a.liftersPage.Execute(w, found); err != nil {
-			log.Printf("%v", err)
+			log.Printf("%v\n", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

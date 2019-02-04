@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"gitlab.com/derwolfe/faststats/api"
 	"gitlab.com/derwolfe/faststats/db"
@@ -20,8 +22,12 @@ func main() {
 	http.HandleFunc("/search", api.Search)
 	http.HandleFunc("/results", api.Results)
 
-	log.Println("Starting on :9090")
-	err = http.ListenAndServe(":9090", nil) // setting listening port
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Printf("Starting on %v\n", port)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", port), nil) // setting listening port
 
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
