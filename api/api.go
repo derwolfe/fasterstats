@@ -186,7 +186,7 @@ var resultsTable = `{{ define "content" }}<div>
 
 var searchForm = `{{define "searchForm" }}
 <nav class="navbar navbar-light bg-light">
-	<a class="navbar-brand">Lifter stats</a>
+	<a class="navbar-brand">bitofapressout.com</a>
 	<form class="form-inline" action="/search" method="GET">
 		<input class="form-control mr-sm-2" name="name" type="search" placeholder="Search" aria-label="Search" required minlength=3>
 		<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
