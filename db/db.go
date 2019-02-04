@@ -1,12 +1,12 @@
 package db
 
 import (
-	"strings"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"log"
+	"strings"
 )
 
 func BuildDB(dbPath string) (*OurDB, error) {

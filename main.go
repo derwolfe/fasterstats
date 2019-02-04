@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	// open the DB in read only mode. If we get SQLi this should limit damage.
 	db, err := db.BuildDB("./results.db?_query_only=1")
 	if err != nil {
 		log.Fatal(err)
