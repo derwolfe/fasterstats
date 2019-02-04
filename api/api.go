@@ -128,17 +128,13 @@ var searchNamesResults = `{{ define "content" }}<div>
 
 var resultsTable = `{{ define "content" }}<div>
 	<h3>{{ .Lifter }}</h3>
-	<h4>{{ .Hometown }}
-	<h4>Bests</h4>
+	<h4>{{ .Hometown }}</h4>
 	<ul>
 		<li>CJ: {{ .BestCJ }}</li>
 		<li>Snatch {{ .BestSN }}</li>
 		<li>Total {{ .BestTotal }}</li>
-	</ul>
-	<h4>Averages (approx)</h4>
-	<ul>
-		<li>CJ: {{ .AvgCJMakes }}</li>
-		<li>Snatch {{ .AvgSNMakes }}</li>
+		<li>Avg CJ: {{ .AvgCJMakes }}</li>
+		<li>Avg Snatch {{ .AvgSNMakes }}</li>
 	</ul>
 </div>
 <div class="table">
