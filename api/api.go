@@ -141,47 +141,48 @@ var resultsTable = `{{ define "content" }}<div>
 	</ul>
 </div>
 <div class="table">
-<table class="table table-sm">
-	<thead class="thead-light">
-		<tr>
-			<th scope="col">Meet Date</th>
-			<th scope="col">Meet</th>
-			<th scope="col">Class</th>
-			<th scope="col">SN1</th>
-			<th scope="col">SN2</th>
-			<th scope="col">SN3</th>
-			<th scope="col">CJ1</th>
-			<th scope="col">CJ2</th>
-			<th scope="col">CJ3</th>
-			<th scope="col">Total</th>
-			<th scope="col">SNs/3</th>
-			<th scope="col">CJs/3</th>
-		</tr>
-	</thead>
-	<tbody class="table-striped">
-	{{ range .Results }}
-		{{ if .BestResult }}
-		<tr bgcolor="lime">
-		{{ else }}
-		<tr>
-		{{ end }}
-			<td scope="row">{{ .Date }}</td>
-			<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
-			<td>{{ .Weightclass }}</td>
-			<td>{{ .SN1 }}</td>
-			<td>{{ .SN2 }}</td>
-			<td>{{ .SN3 }}</td>
-			<td>{{ .CJ1 }}</td>
-			<td>{{ .CJ2 }}</td>
-			<td>{{ .CJ3 }}</td>
-			<td>{{ .Total }}</td>
-			<td>{{ .SNSMade }}</td>
-			<td>{{ .CJSMade }}</td>
-		</tr>
-		{{ end }}
-	</tbody>
-</table>
-</div>{{ end }}`
+	<table class="table table-sm">
+		<thead class="thead-light">
+			<tr>
+				<th scope="col">Meet Date</th>
+				<th scope="col">Meet</th>
+				<th scope="col">Class</th>
+				<th scope="col">SN1</th>
+				<th scope="col">SN2</th>
+				<th scope="col">SN3</th>
+				<th scope="col">CJ1</th>
+				<th scope="col">CJ2</th>
+				<th scope="col">CJ3</th>
+				<th scope="col">Total</th>
+				<th scope="col">SNs/3</th>
+				<th scope="col">CJs/3</th>
+			</tr>
+		</thead>
+		<tbody class="table-striped">
+		{{ range .Results }}
+			{{ if .BestResult }}
+			<tr bgcolor="lime">
+			{{ else }}
+			<tr>
+			{{ end }}
+				<td scope="row">{{ .Date }}</td>
+				<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
+				<td>{{ .Weightclass }}</td>
+				<td>{{ .SN1 }}</td>
+				<td>{{ .SN2 }}</td>
+				<td>{{ .SN3 }}</td>
+				<td>{{ .CJ1 }}</td>
+				<td>{{ .CJ2 }}</td>
+				<td>{{ .CJ3 }}</td>
+				<td>{{ .Total }}</td>
+				<td>{{ .SNSMade }}</td>
+				<td>{{ .CJSMade }}</td>
+			</tr>
+			{{ end }}
+		</tbody>
+	</table>
+</div>
+{{ end }}`
 
 var searchForm = `{{define "searchForm" }}
 <nav class="navbar navbar-light bg-light">
