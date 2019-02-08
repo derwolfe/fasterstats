@@ -144,6 +144,7 @@ var resultsTable = `{{ define "content" }}<div>
 				<th scope="col">Meet Date</th>
 				<th scope="col">Meet</th>
 				<th scope="col">Class</th>
+				<th scope="col">Weight</th>
 				<th scope="col">SN1</th>
 				<th scope="col">SN2</th>
 				<th scope="col">SN3</th>
@@ -151,6 +152,8 @@ var resultsTable = `{{ define "content" }}<div>
 				<th scope="col">CJ2</th>
 				<th scope="col">CJ3</th>
 				<th scope="col">Total</th>
+				<th scope="col">Best SN</th>
+				<th scope="col">Best CJ</th>
 				<th scope="col">SNs/3</th>
 				<th scope="col">CJs/3</th>
 			</tr>
@@ -165,6 +168,7 @@ var resultsTable = `{{ define "content" }}<div>
 				<td scope="row">{{ .Date }}</td>
 				<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
 				<td>{{ .Weightclass }}</td>
+				<td>{{ .CompetitionWeight }}</td>
 				<td>{{ .SN1 }}</td>
 				<td>{{ .SN2 }}</td>
 				<td>{{ .SN3 }}</td>
@@ -172,6 +176,8 @@ var resultsTable = `{{ define "content" }}<div>
 				<td>{{ .CJ2 }}</td>
 				<td>{{ .CJ3 }}</td>
 				<td>{{ .Total }}</td>
+				<td>{{ .BestSN }}</td>
+				<td>{{ .BestCJ }}</td>
 				<td>{{ .SNSMade }}</td>
 				<td>{{ .CJSMade }}</td>
 			</tr>

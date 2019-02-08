@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -25,7 +26,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		return nil, err
 	}
 
-	resultsStmt, err := db.Prepare(`SELECT date, meet_name, lifter, weight_class, hometown, cj1, cj2, cj3, sn1, sn2, sn3, total, url FROM results WHERE lifter = $1 and hometown = $2 ORDER BY date DESC`)
+	resultsStmt, err := db.Prepare(`SELECT date, meet_name, lifter, weight_class, competition_weight, hometown, cj1, cj2, cj3, sn1, sn2, sn3, total, best_snatch, best_cleanjerk, url FROM results WHERE lifter = $1 and hometown = $2 ORDER BY date DESC`)
 	if err != nil {
 		return nil, err
 	}
@@ -73,33 +74,44 @@ type Lifter struct {
 }
 
 type Result struct {
-	Date        string
-	MeetName    string
-	Lifter      string
-	Weightclass string
-	Hometown    string
-	CJ1         decimal.Decimal
-	CJ2         decimal.Decimal
-	CJ3         decimal.Decimal
-	SN1         decimal.Decimal
-	SN2         decimal.Decimal
-	SN3         decimal.Decimal
-	Total       decimal.Decimal
-	URL         string
-	CJSMade     int
-	SNSMade     int
+	Date              string
+	MeetName          string
+	Lifter            string
+	Weightclass       string
+	CompetitionWeight decimal.Decimal
+	Hometown          string
+	CJ1               decimal.Decimal
+	CJ2               decimal.Decimal
+	CJ3               decimal.Decimal
+	SN1               decimal.Decimal
+	SN2               decimal.Decimal
+	SN3               decimal.Decimal
+	Total             decimal.Decimal
+	BestCJ            decimal.Decimal
+	BestSN            decimal.Decimal
+	URL               string
+	CJSMade           int
+	SNSMade           int
 	// this will be filled in by a later method
-	BestCJ     decimal.Decimal
-	BestSN     decimal.Decimal
-	BestResult bool
+	BestCJComputed decimal.Decimal
+	BestSNComputed decimal.Decimal
+	BestResult     bool
+}
+
+func (r *Result) shortenMeetName() {
+	runes := []rune(r.MeetName)
+	maxLen := 40
+	if len(runes) > (maxLen + 1) {
+		r.MeetName = fmt.Sprintf("%s ...", string(r.MeetName[0:maxLen]))
+	}
 }
 
 func (r *Result) missesToMakes() {
 	r.CJSMade = max(0, r.CJ1.Sign()) + max(0, r.CJ2.Sign()) + max(0, r.CJ3.Sign())
 	r.SNSMade = max(0, r.SN1.Sign()) + max(0, r.SN2.Sign()) + max(0, r.SN3.Sign())
 
-	r.BestCJ = maxDec(maxDec(r.CJ1, r.CJ2), r.CJ3)
-	r.BestSN = maxDec(maxDec(r.SN1, r.SN2), r.SN3)
+	r.BestCJComputed = maxDec(maxDec(r.CJ1, r.CJ2), r.CJ3)
+	r.BestSNComputed = maxDec(maxDec(r.SN1, r.SN2), r.SN3)
 }
 
 type ResultsSummary struct {
@@ -161,7 +173,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	var results []*Result
 	for rows.Next() {
 		r := &Result{}
-		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.Weightclass, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.URL)
+		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.Weightclass, &r.CompetitionWeight, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.BestSN, &r.BestCJ, &r.URL)
 		if err != nil {
 			return nil, err
 		}
@@ -169,6 +181,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		// compute misses an makes
 		r.BestResult = false
 		r.missesToMakes()
+		r.shortenMeetName()
 		results = append(results, r)
 	}
 	err = rows.Err()
