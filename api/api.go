@@ -133,8 +133,8 @@ var resultsTable = `{{ define "content" }}<div>
 		<li>CJ: {{ .BestCJ }}</li>
 		<li>Snatch {{ .BestSN }}</li>
 		<li>Total {{ .BestTotal }}</li>
-		<li>Avg CJ: {{ .AvgCJMakes }}</li>
-		<li>Avg Snatch {{ .AvgSNMakes }}</li>
+		<li>Avg SNs made: {{ .AvgSNMakes }}</li>
+		<li>Avg CJs made: {{ .AvgCJMakes }}</li>
 	</ul>
 </div>
 <div class="table">

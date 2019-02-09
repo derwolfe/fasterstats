@@ -90,8 +90,8 @@ type Result struct {
 	BestCJ            decimal.Decimal
 	BestSN            decimal.Decimal
 	URL               string
-	CJSMade           int
-	SNSMade           int
+	CJSMade           decimal.Decimal
+	SNSMade           decimal.Decimal
 	BestResult        bool
 }
 
@@ -104,8 +104,8 @@ func (r *Result) shortenMeetName() {
 }
 
 func (r *Result) missesToMakes() {
-	r.CJSMade = max(0, r.CJ1.Sign()) + max(0, r.CJ2.Sign()) + max(0, r.CJ3.Sign())
-	r.SNSMade = max(0, r.SN1.Sign()) + max(0, r.SN2.Sign()) + max(0, r.SN3.Sign())
+	r.CJSMade = decimal.New(int64(max(0, r.CJ1.Sign()) + max(0, r.CJ2.Sign()) + max(0, r.CJ3.Sign())), 0)
+	r.SNSMade = decimal.New(int64(max(0, r.SN1.Sign()) + max(0, r.SN2.Sign()) + max(0, r.SN3.Sign())), 0)
 }
 
 type ResultsSummary struct {
@@ -205,37 +205,17 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		return nil, err
 	}
 	// now compute avg CJ makes. Loop over the results, converting each to a 1 or -1
-	totalCjs := decimal.Zero
-	totalSns := decimal.Zero
-	numCjs := decimal.Zero
-	numSns := decimal.Zero
-	one := decimal.New(int64(1), 0)
+	totalCJs := decimal.Zero
+	totalSNs := decimal.Zero
+
+	numLiftsBase := decimal.New(int64(len(results) * 3), 1)
 
 	for _, r := range results {
-		if r.CJ1.GreaterThan(decimal.Zero) {
-			totalCjs = r.CJ1.Add(totalCjs)
-			numCjs = numCjs.Add(one)
-		}
-		if r.CJ2.GreaterThan(decimal.Zero) {
-			totalCjs = r.CJ2.Add(totalCjs)
-			numCjs = numCjs.Add(one)
-		}
-		if r.CJ3.GreaterThan(decimal.Zero) {
-			totalCjs = r.CJ3.Add(totalCjs)
-			numCjs = numCjs.Add(one)
-		}
-		if r.SN1.GreaterThan(decimal.Zero) {
-			totalSns = r.SN1.Add(totalSns)
-			numSns = numSns.Add(one)
-		}
-		if r.SN2.GreaterThan(decimal.Zero) {
-			totalSns = r.SN2.Add(totalSns)
-			numSns = numSns.Add(one)
-		}
-		if r.SN3.GreaterThan(decimal.Zero) {
-			totalSns = r.SN3.Add(totalSns)
-			numSns = numSns.Add(one)
-		}
+		// update the avg made
+		totalSNs = r.SNSMade.Add(totalSNs)
+		totalCJs = r.CJSMade.Add(totalCJs)
+
+		// find the bests over the entire result set
 		if r.BestCJ.Equal(rs.BestCJ) {
 			r.BestResult = true
 		}
@@ -246,8 +226,11 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 			r.BestResult = true
 		}
 	}
-	rs.AvgCJMakes = totalCjs.DivRound(numCjs, 2)
-	rs.AvgSNMakes = totalSns.DivRound(numSns, 2)
+	factor := decimal.New(100, 1)
+
+	rs.AvgSNMakes = totalSNs.DivRound(numLiftsBase, 5).Mul(factor)
+	rs.AvgCJMakes = totalCJs.DivRound(numLiftsBase, 5).Mul(factor)
+
 	// we shouldn't get here if there are no results
 	rs.Lifter = results[0].Lifter
 	rs.Hometown = results[0].Hometown
