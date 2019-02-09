@@ -31,13 +31,13 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		return nil, err
 	}
 
-	bestCJ, err := db.Prepare(`with bestCJ as (select cj1 from results where lifter = $1 and hometown = $2 UNION select cj2 from results where lifter = $1 and hometown = $2 UNION select cj3 from results where lifter = $1 and hometown = $2) select MAX(cj1) from bestCJ`)
+	bestCJ, err := db.Prepare(`select max(best_cleanjerk) from results where lifter = $1 and hometown = $2`)
 
 	if err != nil {
 		return nil, err
 	}
 
-	bestSN, err := db.Prepare(`with bestSN as (select sn1 from results where lifter = $1 and hometown = $2 UNION select sn2 from results where lifter = $1 and hometown = $2 UNION select sn3 from results where lifter = $1 and hometown = $2) select MAX(sn1) from bestSN`)
+	bestSN, err := db.Prepare(`select max(best_snatch) from results where lifter = $1 and hometown = $2`)
 
 	if err != nil {
 		return nil, err
@@ -92,10 +92,7 @@ type Result struct {
 	URL               string
 	CJSMade           int
 	SNSMade           int
-	// this will be filled in by a later method
-	BestCJComputed decimal.Decimal
-	BestSNComputed decimal.Decimal
-	BestResult     bool
+	BestResult        bool
 }
 
 func (r *Result) shortenMeetName() {
@@ -109,9 +106,6 @@ func (r *Result) shortenMeetName() {
 func (r *Result) missesToMakes() {
 	r.CJSMade = max(0, r.CJ1.Sign()) + max(0, r.CJ2.Sign()) + max(0, r.CJ3.Sign())
 	r.SNSMade = max(0, r.SN1.Sign()) + max(0, r.SN2.Sign()) + max(0, r.SN3.Sign())
-
-	r.BestCJComputed = maxDec(maxDec(r.CJ1, r.CJ2), r.CJ3)
-	r.BestSNComputed = maxDec(maxDec(r.SN1, r.SN2), r.SN3)
 }
 
 type ResultsSummary struct {
