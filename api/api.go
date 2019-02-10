@@ -54,7 +54,9 @@ func (a API) Search(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("400 - Search name must be greater than 3 characters"))
 			return
 		}
-		found, err := a.db.QueryNames(name)
+		// there might be a page; if so try to use it to look up
+		offset := r.FormValue("offset")
+		found, err := a.db.QueryNames(name, offset)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("500 - Uh oh"))

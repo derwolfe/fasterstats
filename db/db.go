@@ -20,7 +20,12 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		log.Fatal(err)
 	}
 
-	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like $1 ORDER BY lifter ASC LIMIT 100`)
+	allNamesStmt, err := db.Prepare(`SELECT COUNT(*) FROM results WHERE lifter like $1 GROUP BY lifter, hometown ORDER BY lifter ASC`)
+	if err != nil {
+		return nil, err
+	}
+
+	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like $1 ORDER BY lifter ASC LIMIT 100, ?2`)
 	if err != nil {
 		return nil, err
 	}
@@ -50,6 +55,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 
 	return &OurDB{
 		db:             db,
+		nameCtQuery:	nameCtStmt,
 		nameQuery:      nameStmt,
 		resultsQuery:   resultsStmt,
 		bestCJQuery:    bestCJ,
@@ -60,6 +66,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 
 func (o *OurDB) Close() {
 	o.nameQuery.Close()
+	o.nameCtQuery.Close()
 	o.resultsQuery.Close()
 	o.bestCJQuery.Close()
 	o.bestSNQuery.Close()
@@ -113,6 +120,7 @@ type ResultsSummary struct {
 
 type OurDB struct {
 	db             *sql.DB
+	nameCtQuery    *sql.Stmt
 	nameQuery      *sql.Stmt
 	resultsQuery   *sql.Stmt
 	bestCJQuery    *sql.Stmt
@@ -120,11 +128,19 @@ type OurDB struct {
 	bestTotalQuery *sql.Stmt
 }
 
-func (o *OurDB) QueryNames(name string) ([]Lifter, error) {
+func (o *OurDB) QueryNames(name string, offset int) ([]Lifter, error) {
 	log.Printf("name: %v\n", name)
 	name = strings.Replace(name, " ", "%", -1)
-	q := "%" + name + "%"
-	rows, err := o.nameQuery.Query(q)
+	nameLike := "%" + name + "%"
+
+	// get the number of results so we can compute pages. Max result number is 100 per page.
+	var ct int
+	err := o.nameCtQuery.QueryRow(nameLike).Scan(&ct)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := o.nameQuery.Query(nameLike, offset)
 	if err != nil {
 		return nil, err
 	}
