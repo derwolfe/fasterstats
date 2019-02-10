@@ -21,17 +21,19 @@ func NewAPI(db *db.OurDB) *API {
 	// results
 	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
 	lifts.Parse(css)
+	lifts.Parse(navbar)
 	lifts.Parse(searchForm)
 	lifts.Parse(resultsTable)
 
 	// names
 	names := template.Must(template.New("liftingResults").Parse(liftingResults))
 	names.Parse(searchForm)
+	names.Parse(navbar)
 	names.Parse(css)
 	names.Parse(searchNamesResults)
 
 	// search form
-	search := template.Must(template.New("findLiftersForm").Parse(findLiftersForm))
+	search := template.Must(template.New("landingPage").Parse(landingPage))
 	search.Parse(css)
 	search.Parse(searchForm)
 	search.Parse(searchNamesResults)
@@ -106,8 +108,7 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 }
 
 var css = `{{ define "css" }}
-{{/* <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-*/}}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 {{ end }}`
 
 var searchNamesResults = `{{ define "content" }}<div>
@@ -187,13 +188,15 @@ var resultsTable = `{{ define "content" }}<div>
 </div>
 {{ end }}`
 
-var searchForm = `{{define "searchForm" }}
+var searchForm = `{{define "searchForm" }}<form class="form-inline" action="/search" method="GET">
+	<input class="form-control mr-sm-2" name="name" type="search" placeholder="Search" aria-label="Search" required minlength=3>
+	<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+</form>{{ end}}`
+
+var navbar = `{{define "navbar" }}
 <nav class="navbar navbar-light bg-light">
 	<a class="navbar-brand">bitofapressout.com</a>
-	<form class="form-inline" action="/search" method="GET">
-		<input class="form-control mr-sm-2" name="name" type="search" placeholder="Search" aria-label="Search" required minlength=3>
-		<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
-	</form>
+	{{ template "searchForm" }}
 </nav>{{ end }}`
 
 var liftingResults = `<!doctype html>
@@ -205,14 +208,14 @@ var liftingResults = `<!doctype html>
 	</head>
 	<body>
 		<div class="container">
-			{{ template "searchForm" }}
+			{{ template "navbar" }}
 			{{ template "content" .}}
 		</div>
 	</body>
 </html>`
 
 // this should be used inside of another template, not sure how to do that now
-var findLiftersForm = `<!doctype html>
+var landingPage = `<!doctype html>
 <html>
 	<head>
 		<title>Lifter finder</title>
@@ -220,8 +223,18 @@ var findLiftersForm = `<!doctype html>
 		{{ template "css" }}
 	</head>
 	<body>
-		<div class="container">
-			{{ template "searchForm" }}
+		<div class="container h-100">
+			<div class="row h-100">
+				<div class="col-12 p-0 h-100">
+					<div class="jumbotron h-100 text-center m-0 bg-info d-flex flex-column justify-content-center">
+					<form class="col-4" action="/search" method="GET">
+						<h1 class="display">bitofapressout</h1>
+						<p class="lead">Enter a name, find a lifer from scraped USAW meet data</p>
+						<input class="form-control mr-sm-2" name="name" type="search" placeholder="Search" aria-label="Search" required minlength=3>
+						<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+					</form>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>`
