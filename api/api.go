@@ -131,10 +131,10 @@ var resultsTable = `{{ define "content" }}<div>
 	<h4>{{ .Hometown }}</h4>
 	<ul>
 		<li>CJ: {{ .BestCJ }}</li>
-		<li>Snatch {{ .BestSN }}</li>
-		<li>Total {{ .BestTotal }}</li>
-		<li>Avg SNs made: {{ .AvgSNMakes }}</li>
-		<li>Avg CJs made: {{ .AvgCJMakes }}</li>
+		<li>Snatch: {{ .BestSN }}</li>
+		<li>Total: {{ .BestTotal }}</li>
+		<li>Avg SNs made: {{ .AvgSNMakes }}%</li>
+		<li>Avg CJs made: {{ .AvgCJMakes }}%</li>
 	</ul>
 </div>
 <div class="table">
