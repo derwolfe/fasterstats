@@ -126,16 +126,13 @@ var searchNamesResults = `{{ define "content" }}<div>
 		<p>Too many results, please provide more letters</p>
 	{{ end }}
 	{{ if and (gt (len .) 0) (lt (len .) 50) }}
+		<ul class="list-group">
 			{{ range .}}
-			<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
-				<div class="card" style="width: 18rem;">
-					<div class="card-body">
-						  <h5 class="card-title">{{ .Name }}</h5>
-						  <h6 class="card-title text-muted">{{ .Hometown }}</h6>
-					</div>
-				</div>
-			</a>
+				<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
+					<li class="list-group-item">{{ .Name }} - {{ .Hometown }}</li>
+				</a>
 			{{ end }}
+		</ul>
 	{{ end }}
 </div>{{ end }}`
 
