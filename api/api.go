@@ -136,7 +136,8 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 	{{ end }}
 </div>{{ end }}`
 
-var resultsTable = `{{ define "content" }}<div>
+var resultsTable = `{{ define "content" }}
+<div class="mx-auto p-3">
 	<h3>{{ .Lifter }}</h3>
 	<h4>{{ .Hometown }}</h4>
 	<ul>
@@ -146,9 +147,8 @@ var resultsTable = `{{ define "content" }}<div>
 		<li>Avg SNs made: {{ .AvgSNMakes }}%</li>
 		<li>Avg CJs made: {{ .AvgCJMakes }}%</li>
 	</ul>
-</div>
-<div class="table">
-	<table class="table table-sm">
+<div class="table-responsive">
+	<table class="table table-striped">
 		<thead class="thead-light">
 			<tr>
 				<th scope="col">Meet Date</th>
