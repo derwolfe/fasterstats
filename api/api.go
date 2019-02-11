@@ -108,7 +108,14 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 }
 
 var css = `{{ define "css" }}
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">*
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<style>
+.align-items-center {
+	display: flex;
+	align-items: center;  /*Aligns vertically center */
+	justify-content: center; /*Aligns horizontally center */
+  }
+  </style>
 {{ end }}`
 
 var searchNamesResults = `{{ define "content" }}<div>
@@ -224,11 +231,11 @@ var landingPage = `<!doctype html>
 	</head>
 	<body>
 		<div class="container">
-			<div class="d-flex flex-column h-100">
+			<div class="d-flex flex-column align-content-center">
 				<h2 class="display align-self-center">bitofapressout</h1>
 				<p class="align-self-center">Enter a name, find a lifer from scraped USAW meet data</p>
 				<form class="form-inline align-self-center" action="/search" method="GET">
-					<input class="form-control mr-sm-2" name="name" type="search" placeholder="lifter's name" aria-label="Search" required minlength=3>
+					<input class="form-control mr-sm-2" name="name" type="search" placeholder="part of a name" aria-label="Search" required minlength=3>
 					<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
 				</form>
 			</div>
