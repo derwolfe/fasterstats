@@ -118,7 +118,7 @@ var css = `{{ define "css" }}
   </style>
 {{ end }}`
 
-var searchNamesResults = `{{ define "content" }}<div>
+var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 	{{ if eq (len .) 0 }}
 		<p>No names found</p>
 	{{ end }}
