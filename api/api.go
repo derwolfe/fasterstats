@@ -108,14 +108,9 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 }
 
 var css = `{{ define "css" }}
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-<style>
-.align-items-center {
-	display: flex;
-	align-items: center;  /*Aligns vertically center */
-	justify-content: center; /*Aligns horizontally center */
-  }
-  </style>
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/css/uikit.min.css" />
+
 {{ end }}`
 
 var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
@@ -138,10 +133,10 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 
 var resultsTable = `{{ define "content" }}
 <div class="mx-auto p-3">
-  <div class="card">
-  	<div class="card-body">
-		<h5 class="card-title">{{ .Lifter }}</h5>
-		<h6 class="card-subtitle mb-2 text-muted">{{ .Hometown }}</h6>
+  <div class="uk-card uk-card-default">
+  	<div class="uk-card-body">
+		<h5 class="uk-card-title">{{ .Lifter }}</h5>
+		<h6>{{ .Hometown }}</h6>
 		<ul class="">
 			<li class="">Best CJ: {{ .BestCJ }}</li>
 			<li class="">Best Snatch: {{ .BestSN }}</li>
@@ -150,49 +145,49 @@ var resultsTable = `{{ define "content" }}
 			<li class="">Avg SNs made: {{ .AvgSNMakes }}%</li>
 			<li class="">Avg CJs made: {{ .AvgCJMakes }}%</li>
 		</ul>
-		<div class="">
-			<table class="cell-border compact stripe" id="results">
-				<thead class="">
+		<div class="uk-overflow-auto">
+			<table class="uk-table uk-table-divider">
+				<thead>
 					<tr>
-						<th scope="col">Meet Date</th>
-						<th scope="col">Meet</th>
-						<th scope="col">Class</th>
-						<th scope="col">Weight</th>
-						<th scope="col">SN1</th>
-						<th scope="col">SN2</th>
-						<th scope="col">SN3</th>
-						<th scope="col">CJ1</th>
-						<th scope="col">CJ2</th>
-						<th scope="col">CJ3</th>
-						<th scope="col">Total</th>
-						<th scope="col">Best SN</th>
-						<th scope="col">Best CJ</th>
-						<th scope="col">SNs/3</th>
-						<th scope="col">CJs/3</th>
+						<th>Meet Date</th>
+						<th>Meet</th>
+						<th>Class</th>
+						<th>Weight</th>
+						<th>SN1</th>
+						<th>SN2</th>
+						<th>SN3</th>
+						<th>CJ1</th>
+						<th>CJ2</th>
+						<th>CJ3</th>
+						<th>Total</th>
+						<th>Best SN</th>
+						<th>Best CJ</th>
+						<th>SNs/3</th>
+						<th>CJs/3</th>
 					</tr>
 				</thead>
 				<tbody>
 				{{ range .Results }}
 					{{ if .BestResult }}
-					<tr bgcolor="lime">
+					<tr>
 					{{ else }}
 					<tr>
 					{{ end }}
-						<td scope="row">{{ .Date }}</td>
-						<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
-						<td>{{ .Weightclass }}</td>
-						<td>{{ .CompetitionWeight }}</td>
-						<td>{{ .SN1 }}</td>
-						<td>{{ .SN2 }}</td>
-						<td>{{ .SN3 }}</td>
-						<td>{{ .CJ1 }}</td>
-						<td>{{ .CJ2 }}</td>
-						<td>{{ .CJ3 }}</td>
-						<td>{{ .Total }}</td>
-						<td>{{ .BestSN }}</td>
-						<td>{{ .BestCJ }}</td>
-						<td>{{ .SNSMade }}</td>
-						<td>{{ .CJSMade }}</td>
+						<td data-label="Meet Date">{{ .Date }}</td>
+						<td data-label="Name"><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
+						<td data-label="Weight Class">{{ .Weightclass }}</td>
+						<td data-label="Competition Weight">{{ .CompetitionWeight }}</td>
+						<td data-label="SN1">{{ .SN1 }}</td>
+						<td data-label="SN2">{{ .SN2 }}</td>
+						<td data-label="SN3">{{ .SN3 }}</td>
+						<td data-label="CJ1">{{ .CJ1 }}</td>
+						<td data-label="CJ2">{{ .CJ2 }}</td>
+						<td data-label="CJ3">{{ .CJ3 }}</td>
+						<td data-label="Total">{{ .Total }}</td>
+						<td data-label="Best Snatch">{{ .BestSN }}</td>
+						<td data-label="Best CJ">{{ .BestCJ }}</td>
+						<td data-label="# Snatches made">{{ .SNSMade }}</td>
+						<td data-label="# CJs made">{{ .CJSMade }}</td>
 					</tr>
 					{{ end }}
 				</tbody>
@@ -209,7 +204,7 @@ var searchForm = `{{define "searchForm" }}<form class="form-inline" action="/sea
 
 var navbar = `{{define "navbar" }}
 <nav class="navbar navbar-light bg-light">
-	<a class="navbar-brand">bitofapressout.com</a>
+	<a class="navbar-brand" href="/">bitofapressout.com</a>
 	{{ template "searchForm" }}
 </nav>{{ end }}`
 
@@ -221,10 +216,14 @@ var liftingResults = `<!doctype html>
 		{{ template "css"}}
 	</head>
 	<body>
-		<div class="container-fluid">
+		<div class="uk-container">
 			{{ template "navbar" }}
 			{{ template "content" .}}
 		</div>
+
+		<!-- UIkit JS -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/js/uikit.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/js/uikit-icons.min.js"></script>
 	</body>
 </html>`
 
@@ -237,7 +236,7 @@ var landingPage = `<!doctype html>
 		{{ template "css" }}
 	</head>
 	<body>
-		<div class="container">
+		<div class="uk-container">
 			<div class="d-flex flex-column align-content-center">
 				<h2 class="display align-self-center">bitofapressout</h1>
 				<p class="align-self-center">Enter a name, find a lifer from scraped USAW meet data</p>
@@ -247,5 +246,8 @@ var landingPage = `<!doctype html>
 				</form>
 			</div>
 		</div>
+		<!-- UIkit JS -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/js/uikit.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/js/uikit-icons.min.js"></script>
 	</body>
 </html>`

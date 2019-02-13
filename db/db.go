@@ -97,7 +97,7 @@ type Result struct {
 
 func (r *Result) shortenMeetName() {
 	runes := []rune(r.MeetName)
-	maxLen := 30
+	maxLen := 20
 	if len(runes) > (maxLen + 1) {
 		r.MeetName = fmt.Sprintf("%s ...", string(r.MeetName[0:maxLen]))
 	}
