@@ -213,7 +213,7 @@ var searchForm = `{{define "searchForm" }}
 var navbar = `{{define "navbar" }}
 <nav class="uk-navbar-container uk-margin" uk-navbar>
 
-    <div class="nav-overlay uk-navbar-left">
+    <div class="nav-overlay uk-navbar-left uk-margin-left">
         <ul class="uk-navbar-nav">
 			<li class="uk-active"><a href="/">Home</a></li>
 			<li><a href="/about">About</a></li>
@@ -240,8 +240,8 @@ var liftingResults = `<!doctype html>
 		{{ template "css"}}
 	</head>
 	<body>
+		{{ template "navbar" }}
 		<div class="uk-container">
-			{{ template "navbar" }}
 			{{ template "content" .}}
 		</div>
 
