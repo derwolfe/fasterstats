@@ -116,6 +116,7 @@ type ResultsSummary struct {
 	BestTotal  decimal.Decimal
 	AvgCJMakes decimal.Decimal
 	AvgSNMakes decimal.Decimal
+	RecentWeight decimal.Decimal
 	Results    []*Result
 }
 
@@ -234,6 +235,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	// we shouldn't get here if there are no results
 	rs.Lifter = results[0].Lifter
 	rs.Hometown = results[0].Hometown
+	rs.RecentWeight = results[0].CompetitionWeight
 
 	return &rs, nil
 }
