@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -95,28 +94,21 @@ type Result struct {
 	BestResult        bool
 }
 
-func (r *Result) shortenMeetName() {
-	runes := []rune(r.MeetName)
-	maxLen := 40
-	if len(runes) > (maxLen + 1) {
-		r.MeetName = fmt.Sprintf("%s ...", string(r.MeetName[0:maxLen]))
-	}
-}
-
 func (r *Result) missesToMakes() {
-	r.CJSMade = decimal.New(int64(max(0, r.CJ1.Sign()) + max(0, r.CJ2.Sign()) + max(0, r.CJ3.Sign())), 0)
-	r.SNSMade = decimal.New(int64(max(0, r.SN1.Sign()) + max(0, r.SN2.Sign()) + max(0, r.SN3.Sign())), 0)
+	r.CJSMade = decimal.New(int64(max(0, r.CJ1.Sign())+max(0, r.CJ2.Sign())+max(0, r.CJ3.Sign())), 0)
+	r.SNSMade = decimal.New(int64(max(0, r.SN1.Sign())+max(0, r.SN2.Sign())+max(0, r.SN3.Sign())), 0)
 }
 
 type ResultsSummary struct {
-	Lifter     string
-	Hometown   string
-	BestCJ     decimal.Decimal
-	BestSN     decimal.Decimal
-	BestTotal  decimal.Decimal
-	AvgCJMakes decimal.Decimal
-	AvgSNMakes decimal.Decimal
-	Results    []*Result
+	Lifter       string
+	Hometown     string
+	BestCJ       decimal.Decimal
+	BestSN       decimal.Decimal
+	BestTotal    decimal.Decimal
+	AvgCJMakes   decimal.Decimal
+	AvgSNMakes   decimal.Decimal
+	RecentWeight decimal.Decimal
+	Results      []*Result
 }
 
 type OurDB struct {
@@ -175,7 +167,6 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		// compute misses an makes
 		r.BestResult = false
 		r.missesToMakes()
-		r.shortenMeetName()
 		results = append(results, r)
 	}
 	err = rows.Err()
@@ -208,7 +199,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	totalCJs := decimal.Zero
 	totalSNs := decimal.Zero
 
-	numLiftsBase := decimal.New(int64(len(results) * 3), 1)
+	numLiftsBase := decimal.New(int64(len(results)*3), 1)
 
 	for _, r := range results {
 		// update the avg made
@@ -234,6 +225,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	// we shouldn't get here if there are no results
 	rs.Lifter = results[0].Lifter
 	rs.Hometown = results[0].Hometown
+	rs.RecentWeight = results[0].CompetitionWeight
 
 	return &rs, nil
 }

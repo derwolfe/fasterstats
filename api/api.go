@@ -21,17 +21,19 @@ func NewAPI(db *db.OurDB) *API {
 	// results
 	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
 	lifts.Parse(css)
+	lifts.Parse(navbar)
 	lifts.Parse(searchForm)
 	lifts.Parse(resultsTable)
 
 	// names
 	names := template.Must(template.New("liftingResults").Parse(liftingResults))
 	names.Parse(searchForm)
+	names.Parse(navbar)
 	names.Parse(css)
 	names.Parse(searchNamesResults)
 
 	// search form
-	search := template.Must(template.New("findLiftersForm").Parse(findLiftersForm))
+	search := template.Must(template.New("landingPage").Parse(landingPage))
 	search.Parse(css)
 	search.Parse(searchForm)
 	search.Parse(searchNamesResults)
@@ -106,11 +108,23 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 }
 
 var css = `{{ define "css" }}
-{{/* <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-*/}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/css/uikit.min.css" />
+<style>
+a {
+	color: #1C242E;
+	}
+body {
+	font-family: sans-serif;
+	color: #1C242E;
+}
+.best-row {
+	font-weight:bold;
+}
+</style>
 {{ end }}`
 
-var searchNamesResults = `{{ define "content" }}<div>
+var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 	{{ if eq (len .) 0 }}
 		<p>No names found</p>
 	{{ end }}
@@ -118,110 +132,155 @@ var searchNamesResults = `{{ define "content" }}<div>
 		<p>Too many results, please provide more letters</p>
 	{{ end }}
 	{{ if and (gt (len .) 0) (lt (len .) 50) }}
-		<ul>
+		<ul class="list-group">
 			{{ range .}}
-				<li><a href="results?name={{ .Name }}&hometown={{ .Hometown }}">{{ .Name }} - {{ .Hometown }}</li></a>
+				<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
+					<li class="list-group-item">{{ .Name }} - {{ .Hometown }}</li>
+				</a>
 			{{ end }}
 		</ul>
 	{{ end }}
 </div>{{ end }}`
 
-var resultsTable = `{{ define "content" }}<div>
-	<h3>{{ .Lifter }}</h3>
-	<h4>{{ .Hometown }}</h4>
-	<ul>
-		<li>CJ: {{ .BestCJ }}</li>
-		<li>Snatch: {{ .BestSN }}</li>
-		<li>Total: {{ .BestTotal }}</li>
-		<li>Avg SNs made: {{ .AvgSNMakes }}%</li>
-		<li>Avg CJs made: {{ .AvgCJMakes }}%</li>
-	</ul>
-</div>
-<div class="table">
-	<table class="table table-sm">
-		<thead class="thead-light">
-			<tr>
-				<th scope="col">Meet Date</th>
-				<th scope="col">Meet</th>
-				<th scope="col">Class</th>
-				<th scope="col">Weight</th>
-				<th scope="col">SN1</th>
-				<th scope="col">SN2</th>
-				<th scope="col">SN3</th>
-				<th scope="col">CJ1</th>
-				<th scope="col">CJ2</th>
-				<th scope="col">CJ3</th>
-				<th scope="col">Total</th>
-				<th scope="col">Best SN</th>
-				<th scope="col">Best CJ</th>
-				<th scope="col">SNs/3</th>
-				<th scope="col">CJs/3</th>
-			</tr>
-		</thead>
-		<tbody class="table-striped">
-		{{ range .Results }}
-			{{ if .BestResult }}
-			<tr bgcolor="lime">
-			{{ else }}
-			<tr>
-			{{ end }}
-				<td scope="row">{{ .Date }}</td>
-				<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
-				<td>{{ .Weightclass }}</td>
-				<td>{{ .CompetitionWeight }}</td>
-				<td>{{ .SN1 }}</td>
-				<td>{{ .SN2 }}</td>
-				<td>{{ .SN3 }}</td>
-				<td>{{ .CJ1 }}</td>
-				<td>{{ .CJ2 }}</td>
-				<td>{{ .CJ3 }}</td>
-				<td>{{ .Total }}</td>
-				<td>{{ .BestSN }}</td>
-				<td>{{ .BestCJ }}</td>
-				<td>{{ .SNSMade }}</td>
-				<td>{{ .CJSMade }}</td>
-			</tr>
-			{{ end }}
-		</tbody>
-	</table>
+var resultsTable = `{{ define "content" }}
+<article class="uk-article">
+	<h4 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h4>
+	<h3>Statistics</h3>
+	<div class="uk-grid-divider uk-child-width-expand@s" uk-grid>
+		<div>
+			<ul class="uk-list">
+				<li>Best CJ: {{ .BestCJ }}</li>
+				<li>Best Snatch: {{ .BestSN }}</li>
+				<li>Best Total: {{ .BestTotal }}</li>
+			<ul>
+		</div>
+		<div>
+			<ul class="uk-list">
+				<li>Most recent weight: {{ .RecentWeight }}</li>
+				<li>Avg # Snatches made: {{ .AvgSNMakes }}%</li>
+				<li>Avg # Clean & Jerks made: {{ .AvgCJMakes }}%</li>
+			</ul>
+		</div>
+	</div>
+	<h3>Competitions</h3>
+	<p class="uk-text-muted">*Bests are bolded</p>
+	<div class="uk-overflow-auto">
+		<table class="uk-table uk-table-divider uk-table-hover">
+			<thead>
+				<tr>
+					<th class="uk-table-expand">Meet Date</th>
+					<th class="uk-table-expand">Meet</th>
+					<th>Class@weight</th>
+					<th>SN1</th>
+					<th>SN2</th>
+					<th>SN3</th>
+					<th>CJ1</th>
+					<th>CJ2</th>
+					<th>CJ3</th>
+					<th>Total</th>
+					<th>Best SN</th>
+					<th>Best CJ</th>
+					<th>SNs/3</th>
+					<th>CJs/3</th>
+				</tr>
+			</thead>
+			<tbody>
+			{{ range .Results }}
+				{{ if .BestResult }}
+				<tr class="best-row">
+				{{ else }}
+				<tr>
+				{{ end }}
+					<td data-label="Meet Date">{{ .Date }}</td>
+					<td data-label="Name"><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
+					<td data-label="Weight Class">{{ .Weightclass }} @ {{ .CompetitionWeight }}</td>
+					<td data-label="SN1">{{ .SN1 }}</td>
+					<td data-label="SN2">{{ .SN2 }}</td>
+					<td data-label="SN3">{{ .SN3 }}</td>
+					<td data-label="CJ1">{{ .CJ1 }}</td>
+					<td data-label="CJ2">{{ .CJ2 }}</td>
+					<td data-label="CJ3">{{ .CJ3 }}</td>
+					<td data-label="Total">{{ .Total }}</td>
+					<td data-label="Best Snatch">{{ .BestSN }}</td>
+					<td data-label="Best CJ">{{ .BestCJ }}</td>
+					<td data-label="# Snatches made">{{ .SNSMade }}</td>
+					<td data-label="# CJs made">{{ .CJSMade }}</td>
+				</tr>
+				{{ end }}
+			</tbody>
+		</table>
+	</div>
 </div>
 {{ end }}`
 
 var searchForm = `{{define "searchForm" }}
-<nav class="navbar navbar-light bg-light">
-	<a class="navbar-brand">bitofapressout.com</a>
-	<form class="form-inline" action="/search" method="GET">
-		<input class="form-control mr-sm-2" name="name" type="search" placeholder="Search" aria-label="Search" required minlength=3>
-		<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
-	</form>
-</nav>{{ end }}`
+<form class="uk-search" action="/search" method="GET">
+	<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter" required minlength=3>
+	<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+</form>
+{{ end}}`
+
+var navbar = `{{define "navbar" }}
+<nav class="uk-navbar-container uk-margin" uk-navbar>
+
+    <div class="nav-overlay uk-navbar-left uk-margin-left">
+        <ul class="uk-navbar-nav">
+					<li class="uk-active"><a href="/">Home</a></li>
+        </ul>
+    </div>
+
+    <div class="nav-overlay uk-navbar-right">
+		<div>
+			<div class="uk-margin-right">
+				<form class="uk-search uk-search-default uk-search-navbar" action="/search" method="GET">
+					<span class="uk-search-icon-flip" uk-search-icon></span>
+					<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter" required minlength=3 autofocus>
+				</form>
+ 	       </div>
+    </div>
+</nav>
+{{ end }}`
 
 var liftingResults = `<!doctype html>
 <html>
 	<head>
-		<title>Lifter finder</title>
+		<title>bitofapressout.com</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		{{ template "css"}}
 	</head>
 	<body>
-		<div class="container">
-			{{ template "searchForm" }}
+		{{ template "navbar" }}
+		<div class="uk-container">
 			{{ template "content" .}}
 		</div>
+
+		<!-- UIkit JS -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/js/uikit.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/js/uikit-icons.min.js"></script>
 	</body>
 </html>`
 
 // this should be used inside of another template, not sure how to do that now
-var findLiftersForm = `<!doctype html>
+var landingPage = `<!doctype html>
 <html>
 	<head>
-		<title>Lifter finder</title>
+		<title>bitofapressout.com</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		{{ template "css" }}
 	</head>
 	<body>
-		<div class="container">
-			{{ template "searchForm" }}
+		<div class="uk-container">
+			<div class="d-flex flex-column align-content-center">
+				<h2 class="display align-self-center">bitofapressout</h1>
+				<p class="align-self-center">Enter a name, find a lifer from scraped USAW meet data</p>
+				<form class="form-inline align-self-center" action="/search" method="GET">
+					<input class="form-control mr-sm-2" name="name" type="search" placeholder="part of a name" aria-label="Search" required minlength=3>
+					<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+				</form>
+			</div>
 		</div>
+		<!-- UIkit JS -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/js/uikit.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/js/uikit-icons.min.js"></script>
 	</body>
 </html>`
