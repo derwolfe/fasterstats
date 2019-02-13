@@ -104,20 +104,20 @@ func (r *Result) shortenMeetName() {
 }
 
 func (r *Result) missesToMakes() {
-	r.CJSMade = decimal.New(int64(max(0, r.CJ1.Sign()) + max(0, r.CJ2.Sign()) + max(0, r.CJ3.Sign())), 0)
-	r.SNSMade = decimal.New(int64(max(0, r.SN1.Sign()) + max(0, r.SN2.Sign()) + max(0, r.SN3.Sign())), 0)
+	r.CJSMade = decimal.New(int64(max(0, r.CJ1.Sign())+max(0, r.CJ2.Sign())+max(0, r.CJ3.Sign())), 0)
+	r.SNSMade = decimal.New(int64(max(0, r.SN1.Sign())+max(0, r.SN2.Sign())+max(0, r.SN3.Sign())), 0)
 }
 
 type ResultsSummary struct {
-	Lifter     string
-	Hometown   string
-	BestCJ     decimal.Decimal
-	BestSN     decimal.Decimal
-	BestTotal  decimal.Decimal
-	AvgCJMakes decimal.Decimal
-	AvgSNMakes decimal.Decimal
+	Lifter       string
+	Hometown     string
+	BestCJ       decimal.Decimal
+	BestSN       decimal.Decimal
+	BestTotal    decimal.Decimal
+	AvgCJMakes   decimal.Decimal
+	AvgSNMakes   decimal.Decimal
 	RecentWeight decimal.Decimal
-	Results    []*Result
+	Results      []*Result
 }
 
 type OurDB struct {
@@ -209,7 +209,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	totalCJs := decimal.Zero
 	totalSNs := decimal.Zero
 
-	numLiftsBase := decimal.New(int64(len(results) * 3), 1)
+	numLiftsBase := decimal.New(int64(len(results)*3), 1)
 
 	for _, r := range results {
 		// update the avg made
