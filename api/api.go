@@ -225,8 +225,7 @@ var navbar = `{{define "navbar" }}
 
     <div class="nav-overlay uk-navbar-left uk-margin-left">
         <ul class="uk-navbar-nav">
-			<li class="uk-active"><a href="/">Home</a></li>
-			<li><a href="/about">About</a></li>
+					<li class="uk-active"><a href="/">Home</a></li>
         </ul>
     </div>
 
