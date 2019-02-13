@@ -205,7 +205,7 @@ var resultsTable = `{{ define "content" }}
 
 var searchForm = `{{define "searchForm" }}
 <form class="uk-search" action="/search" method="GET">
-	<input class="uk-search-input" name="name" type="search" placeholder="Search" required minlength=3>
+	<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter" required minlength=3>
 	<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
 </form>
 {{ end}}`
@@ -225,7 +225,7 @@ var navbar = `{{define "navbar" }}
 			<div class="uk-margin-right">
 				<form class="uk-search uk-search-default uk-search-navbar" action="/search" method="GET">
 					<span class="uk-search-icon-flip" uk-search-icon></span>
-					<input class="uk-search-input" name="name" type="search" placeholder="Search" required minlength=3 autofocus>
+					<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter" required minlength=3 autofocus>
 				</form>
  	       </div>
     </div>
