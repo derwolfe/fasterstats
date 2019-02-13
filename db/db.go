@@ -97,9 +97,9 @@ type Result struct {
 
 func (r *Result) shortenMeetName() {
 	runes := []rune(r.MeetName)
-	maxLen := 20
+	maxLen := 40
 	if len(runes) > (maxLen + 1) {
-		r.MeetName = fmt.Sprintf("%s ...", string(r.MeetName[0:maxLen]))
+		r.MeetName = fmt.Sprintf("%s", string(r.MeetName[0:maxLen]))
 	}
 }
 
@@ -176,7 +176,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		// compute misses an makes
 		r.BestResult = false
 		r.missesToMakes()
-		r.shortenMeetName()
+		// r.shortenMeetName()
 		results = append(results, r)
 	}
 	err = rows.Err()

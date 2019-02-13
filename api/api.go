@@ -110,7 +110,11 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 var css = `{{ define "css" }}
 <!-- UIkit CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/css/uikit.min.css" />
-
+<style>
+a {
+	color: #1C242E;
+  }
+</style>
 {{ end }}`
 
 var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
@@ -132,81 +136,101 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 </div>{{ end }}`
 
 var resultsTable = `{{ define "content" }}
-<div class="mx-auto p-3">
-  <div class="uk-card uk-card-default">
-  	<div class="uk-card-body">
-		<h5 class="uk-card-title">{{ .Lifter }}</h5>
-		<h6>{{ .Hometown }}</h6>
-		<ul class="">
-			<li class="">Best CJ: {{ .BestCJ }}</li>
-			<li class="">Best Snatch: {{ .BestSN }}</li>
-			<li class="">Best Total: {{ .BestTotal }}</li>
-			<li class="">Most recent weight: {{ .RecentWeight }}
-			<li class="">Avg SNs made: {{ .AvgSNMakes }}%</li>
-			<li class="">Avg CJs made: {{ .AvgCJMakes }}%</li>
-		</ul>
-		<div class="uk-overflow-auto">
-			<table class="uk-table uk-table-divider">
-				<thead>
-					<tr>
-						<th>Meet Date</th>
-						<th>Meet</th>
-						<th>Class</th>
-						<th>Weight</th>
-						<th>SN1</th>
-						<th>SN2</th>
-						<th>SN3</th>
-						<th>CJ1</th>
-						<th>CJ2</th>
-						<th>CJ3</th>
-						<th>Total</th>
-						<th>Best SN</th>
-						<th>Best CJ</th>
-						<th>SNs/3</th>
-						<th>CJs/3</th>
-					</tr>
-				</thead>
-				<tbody>
-				{{ range .Results }}
-					{{ if .BestResult }}
-					<tr>
-					{{ else }}
-					<tr>
-					{{ end }}
-						<td data-label="Meet Date">{{ .Date }}</td>
-						<td data-label="Name"><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
-						<td data-label="Weight Class">{{ .Weightclass }}</td>
-						<td data-label="Competition Weight">{{ .CompetitionWeight }}</td>
-						<td data-label="SN1">{{ .SN1 }}</td>
-						<td data-label="SN2">{{ .SN2 }}</td>
-						<td data-label="SN3">{{ .SN3 }}</td>
-						<td data-label="CJ1">{{ .CJ1 }}</td>
-						<td data-label="CJ2">{{ .CJ2 }}</td>
-						<td data-label="CJ3">{{ .CJ3 }}</td>
-						<td data-label="Total">{{ .Total }}</td>
-						<td data-label="Best Snatch">{{ .BestSN }}</td>
-						<td data-label="Best CJ">{{ .BestCJ }}</td>
-						<td data-label="# Snatches made">{{ .SNSMade }}</td>
-						<td data-label="# CJs made">{{ .CJSMade }}</td>
-					</tr>
-					{{ end }}
-				</tbody>
-			</table>
+<article class="uk-article">
+	<h4 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h4>
+	<div class="uk-grid-divider uk-child-width-expand@s" uk-grid>
+  		<div>
+			<ul class="uk-list">
+				<li>Best CJ: {{ .BestCJ }}</li>
+				<li>Best Snatch: {{ .BestSN }}</li>
+				<li>Best Total: {{ .BestTotal }}</li>
+			<ul>
 		</div>
+		<div>
+			<ul class="uk-list">
+				<li>Most recent weight: {{ .RecentWeight }}</li>
+				<li>Avg # Snatchess made: {{ .AvgSNMakes }}%</li>
+				<li>Avg # Cleand and Jerks made: {{ .AvgCJMakes }}%</li>
+			</ul>
+		</div>
+	</div>
+	<div class="uk-overflow-auto">
+		<table class="uk-table uk-table-divider uk-table-hover">
+			<thead>
+				<tr>
+					<th class="uk-table-expand">Meet Date</th>
+					<th class="uk-table-expand">Meet</th>
+					<th>Class@weight</th>
+					<th>SN1</th>
+					<th>SN2</th>
+					<th>SN3</th>
+					<th>CJ1</th>
+					<th>CJ2</th>
+					<th>CJ3</th>
+					<th>Total</th>
+					<th>Best SN</th>
+					<th>Best CJ</th>
+					<th>SNs/3</th>
+					<th>CJs/3</th>
+				</tr>
+			</thead>
+			<tbody>
+			{{ range .Results }}
+				{{ if .BestResult }}
+				<tr>
+				{{ else }}
+				<tr>
+				{{ end }}
+					<td data-label="Meet Date">{{ .Date }}</td>
+					<td data-label="Name"><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
+					<td data-label="Weight Class">{{ .Weightclass }} @ {{ .CompetitionWeight }}</td>
+					<td data-label="SN1">{{ .SN1 }}</td>
+					<td data-label="SN2">{{ .SN2 }}</td>
+					<td data-label="SN3">{{ .SN3 }}</td>
+					<td data-label="CJ1">{{ .CJ1 }}</td>
+					<td data-label="CJ2">{{ .CJ2 }}</td>
+					<td data-label="CJ3">{{ .CJ3 }}</td>
+					<td data-label="Total">{{ .Total }}</td>
+					<td data-label="Best Snatch">{{ .BestSN }}</td>
+					<td data-label="Best CJ">{{ .BestCJ }}</td>
+					<td data-label="# Snatches made">{{ .SNSMade }}</td>
+					<td data-label="# CJs made">{{ .CJSMade }}</td>
+				</tr>
+				{{ end }}
+			</tbody>
+		</table>
 	</div>
 </div>
 {{ end }}`
 
-var searchForm = `{{define "searchForm" }}<form class="form-inline" action="/search" method="GET">
-	<input class="form-control mr-sm-2" name="name" type="search" placeholder="Search" aria-label="Search" required minlength=3>
+var searchForm = `{{define "searchForm" }}
+<form class="uk-search" action="/search" method="GET">
+	<input class="uk-search-input" name="name" type="search" placeholder="Search" required minlength=3>
 	<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
-</form>{{ end}}`
+</form>
+{{ end}}`
 
 var navbar = `{{define "navbar" }}
-<nav class="navbar navbar-light bg-light">
-	<a class="navbar-brand" href="/">bitofapressout.com</a>
-	{{ template "searchForm" }}
-</nav>{{ end }}`
+<nav class="uk-navbar-container uk-margin" uk-navbar>
+
+    <div class="nav-overlay uk-navbar-left">
+        <ul class="uk-navbar-nav">
+			<li class="uk-active"><a href="/">Home</a></li>
+			<li><a href="/about">About</a></li>
+        </ul>
+    </div>
+
+    <div class="nav-overlay uk-navbar-right">
+		<div>
+			<div class="uk-margin-right">
+				<form class="uk-search uk-search-default uk-search-navbar" action="/search" method="GET">
+					<span class="uk-search-icon-flip" uk-search-icon></span>
+					<input class="uk-search-input" name="name" type="search" placeholder="Search" required minlength=3 autofocus>
+				</form>
+ 	       </div>
+    </div>
+</nav>
+{{ end }}`
 
 var liftingResults = `<!doctype html>
 <html>
