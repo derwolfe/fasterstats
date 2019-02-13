@@ -95,14 +95,6 @@ type Result struct {
 	BestResult        bool
 }
 
-func (r *Result) shortenMeetName() {
-	runes := []rune(r.MeetName)
-	maxLen := 40
-	if len(runes) > (maxLen + 1) {
-		r.MeetName = fmt.Sprintf("%s", string(r.MeetName[0:maxLen]))
-	}
-}
-
 func (r *Result) missesToMakes() {
 	r.CJSMade = decimal.New(int64(max(0, r.CJ1.Sign())+max(0, r.CJ2.Sign())+max(0, r.CJ3.Sign())), 0)
 	r.SNSMade = decimal.New(int64(max(0, r.SN1.Sign())+max(0, r.SN2.Sign())+max(0, r.SN3.Sign())), 0)
@@ -176,7 +168,6 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		// compute misses an makes
 		r.BestResult = false
 		r.missesToMakes()
-		// r.shortenMeetName()
 		results = append(results, r)
 	}
 	err = rows.Err()
