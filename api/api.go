@@ -113,7 +113,14 @@ var css = `{{ define "css" }}
 <style>
 a {
 	color: #1C242E;
-  }
+	}
+body {
+	font-family: sans-serif;
+	color: #1C242E;
+}
+.best-row {
+	font-weight:bold;
+}
 </style>
 {{ end }}`
 
@@ -138,8 +145,9 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 var resultsTable = `{{ define "content" }}
 <article class="uk-article">
 	<h4 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h4>
+	<h3>Statistics</h3>
 	<div class="uk-grid-divider uk-child-width-expand@s" uk-grid>
-  		<div>
+		<div>
 			<ul class="uk-list">
 				<li>Best CJ: {{ .BestCJ }}</li>
 				<li>Best Snatch: {{ .BestSN }}</li>
@@ -149,11 +157,13 @@ var resultsTable = `{{ define "content" }}
 		<div>
 			<ul class="uk-list">
 				<li>Most recent weight: {{ .RecentWeight }}</li>
-				<li>Avg # Snatchess made: {{ .AvgSNMakes }}%</li>
-				<li>Avg # Cleand and Jerks made: {{ .AvgCJMakes }}%</li>
+				<li>Avg # Snatches made: {{ .AvgSNMakes }}%</li>
+				<li>Avg # Clean & Jerks made: {{ .AvgCJMakes }}%</li>
 			</ul>
 		</div>
 	</div>
+	<h3>Competitions</h3>
+	<p class="uk-text-muted">*Bests are bolded</p>
 	<div class="uk-overflow-auto">
 		<table class="uk-table uk-table-divider uk-table-hover">
 			<thead>
@@ -177,7 +187,7 @@ var resultsTable = `{{ define "content" }}
 			<tbody>
 			{{ range .Results }}
 				{{ if .BestResult }}
-				<tr>
+				<tr class="best-row">
 				{{ else }}
 				<tr>
 				{{ end }}
