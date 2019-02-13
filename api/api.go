@@ -138,62 +138,67 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 
 var resultsTable = `{{ define "content" }}
 <div class="mx-auto p-3">
-	<h3>{{ .Lifter }}</h3>
-	<h4>{{ .Hometown }}</h4>
-	<ul>
-		<li>CJ: {{ .BestCJ }}</li>
-		<li>Snatch: {{ .BestSN }}</li>
-		<li>Total: {{ .BestTotal }}</li>
-		<li>Avg SNs made: {{ .AvgSNMakes }}%</li>
-		<li>Avg CJs made: {{ .AvgCJMakes }}%</li>
-	</ul>
-<div class="table-responsive">
-	<table class="table table-striped">
-		<thead class="thead-light">
-			<tr>
-				<th scope="col">Meet Date</th>
-				<th scope="col">Meet</th>
-				<th scope="col">Class</th>
-				<th scope="col">Weight</th>
-				<th scope="col">SN1</th>
-				<th scope="col">SN2</th>
-				<th scope="col">SN3</th>
-				<th scope="col">CJ1</th>
-				<th scope="col">CJ2</th>
-				<th scope="col">CJ3</th>
-				<th scope="col">Total</th>
-				<th scope="col">Best SN</th>
-				<th scope="col">Best CJ</th>
-				<th scope="col">SNs/3</th>
-				<th scope="col">CJs/3</th>
-			</tr>
-		</thead>
-		<tbody class="table-striped">
-		{{ range .Results }}
-			{{ if .BestResult }}
-			<tr bgcolor="lime">
-			{{ else }}
-			<tr>
-			{{ end }}
-				<td scope="row">{{ .Date }}</td>
-				<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
-				<td>{{ .Weightclass }}</td>
-				<td>{{ .CompetitionWeight }}</td>
-				<td>{{ .SN1 }}</td>
-				<td>{{ .SN2 }}</td>
-				<td>{{ .SN3 }}</td>
-				<td>{{ .CJ1 }}</td>
-				<td>{{ .CJ2 }}</td>
-				<td>{{ .CJ3 }}</td>
-				<td>{{ .Total }}</td>
-				<td>{{ .BestSN }}</td>
-				<td>{{ .BestCJ }}</td>
-				<td>{{ .SNSMade }}</td>
-				<td>{{ .CJSMade }}</td>
-			</tr>
-			{{ end }}
-		</tbody>
-	</table>
+  <div class="card">
+  	<div class="card-body">
+		<h5 class="card-title">{{ .Lifter }}</h5>
+		<h6 class="card-subtitle mb-2 text-muted">{{ .Hometown }}</h6>
+		<ul class="">
+			<li class="">Best CJ: {{ .BestCJ }}</li>
+			<li class="">Best Snatch: {{ .BestSN }}</li>
+			<li class="">Best Total: {{ .BestTotal }}</li>
+			<li class="">Most recent weight: {{ .RecentWeight }}
+			<li class="">Avg SNs made: {{ .AvgSNMakes }}%</li>
+			<li class="">Avg CJs made: {{ .AvgCJMakes }}%</li>
+		</ul>
+		<div class="">
+			<table class="cell-border compact stripe" id="results">
+				<thead class="">
+					<tr>
+						<th scope="col">Meet Date</th>
+						<th scope="col">Meet</th>
+						<th scope="col">Class</th>
+						<th scope="col">Weight</th>
+						<th scope="col">SN1</th>
+						<th scope="col">SN2</th>
+						<th scope="col">SN3</th>
+						<th scope="col">CJ1</th>
+						<th scope="col">CJ2</th>
+						<th scope="col">CJ3</th>
+						<th scope="col">Total</th>
+						<th scope="col">Best SN</th>
+						<th scope="col">Best CJ</th>
+						<th scope="col">SNs/3</th>
+						<th scope="col">CJs/3</th>
+					</tr>
+				</thead>
+				<tbody>
+				{{ range .Results }}
+					{{ if .BestResult }}
+					<tr bgcolor="lime">
+					{{ else }}
+					<tr>
+					{{ end }}
+						<td scope="row">{{ .Date }}</td>
+						<td><a rel="noopener noreferrer" target="_blank" href="{{ .URL }}&isPopup=&Tab=Results">{{ .MeetName }}</a></td>
+						<td>{{ .Weightclass }}</td>
+						<td>{{ .CompetitionWeight }}</td>
+						<td>{{ .SN1 }}</td>
+						<td>{{ .SN2 }}</td>
+						<td>{{ .SN3 }}</td>
+						<td>{{ .CJ1 }}</td>
+						<td>{{ .CJ2 }}</td>
+						<td>{{ .CJ3 }}</td>
+						<td>{{ .Total }}</td>
+						<td>{{ .BestSN }}</td>
+						<td>{{ .BestCJ }}</td>
+						<td>{{ .SNSMade }}</td>
+						<td>{{ .CJSMade }}</td>
+					</tr>
+					{{ end }}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
 {{ end }}`
 
