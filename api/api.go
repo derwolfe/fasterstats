@@ -144,19 +144,19 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 
 var resultsTable = `{{ define "content" }}
 <article class="uk-article">
-	<h4 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h4>
+	<h1 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h1>
 	<h3>Statistics</h3>
 	<div class="uk-grid-divider uk-child-width-expand@s" uk-grid>
 		<div>
 			<ul class="uk-list">
-				<li>Best CJ: {{ .BestCJ }}</li>
-				<li>Best Snatch: {{ .BestSN }}</li>
-				<li>Best Total: {{ .BestTotal }}</li>
+				<li>Best CJ: {{ .BestCJ }} kg</li>
+				<li>Best Snatch: {{ .BestSN }} kg </li>
+				<li>Best Total: {{ .BestTotal }} kg</li>
 			<ul>
 		</div>
 		<div>
 			<ul class="uk-list">
-				<li>Most recent weight: {{ .RecentWeight }}</li>
+				<li>Most recent weight: {{ .RecentWeight }} kg</li>
 				<li>Avg # Snatches made: {{ .AvgSNMakes }}%</li>
 				<li>Avg # Clean & Jerks made: {{ .AvgCJMakes }}%</li>
 			</ul>
@@ -169,7 +169,7 @@ var resultsTable = `{{ define "content" }}
 			<thead>
 				<tr>
 					<th class="uk-table-expand">Meet Date</th>
-					<th class="uk-table-expand">Meet</th>
+					<th class="uk-table-expand">Meet (link to USAW)</th>
 					<th>Class@weight</th>
 					<th>SN1</th>
 					<th>SN2</th>
