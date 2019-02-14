@@ -214,9 +214,9 @@ var resultsTable = `{{ define "content" }}
 {{ end }}`
 
 var searchForm = `{{define "searchForm" }}
-<form class="uk-search" action="/search" method="GET">
+<form class="uk-search uk-search-default" action="/search" method="GET">
 	<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter" required minlength=3>
-	<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+	<button class="uk-button" type="submit" value="Search">Search</button>
 </form>
 {{ end}}`
 
@@ -270,12 +270,12 @@ var landingPage = `<!doctype html>
 	</head>
 	<body>
 		<div class="uk-container">
-			<div class="d-flex flex-column align-content-center">
-				<h2 class="display align-self-center">bitofapressout</h1>
-				<p class="align-self-center">Enter a name, find a lifer from scraped USAW meet data</p>
-				<form class="form-inline align-self-center" action="/search" method="GET">
-					<input class="form-control mr-sm-2" name="name" type="search" placeholder="part of a name" aria-label="Search" required minlength=3>
-					<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+			<div class="uk-position-center">
+				<h2 class="">bitofapressout</h1>
+				<p class="">Enter a name, find a lifer from scraped USAW meet data</p>
+				<form class="uk-form" action="/search" method="GET">
+					<input class="uk-search uk-search-default" name="name" type="search" placeholder="part of a name" required minlength=3>
+					<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
 				</form>
 			</div>
 		</div>
