@@ -133,6 +133,7 @@ type OurDB struct {
 type LiftersResponse struct {
 	Lifters []Lifter
 	Total int64
+	TotalPages int64
 	Current int64
 	Next int64
 }
@@ -160,7 +161,6 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 		}
 		return resp, nil
 	}
-	fmt.Printf("t: %v", total)
 
 	// get the offset
 	pageLimit := int64(50)
@@ -196,7 +196,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 		log.Print(err)
 		return nil, err
 	}
-	fmt.Printf("rows: %v", lifters)
+
 	// there are 50 per page
 	numPages := total / 50
 	next := onum
@@ -209,6 +209,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	resp := &LiftersResponse{
 		Lifters: lifters,
 		Total: total,
+		TotalPages: numPages,
 		Current: onum,
 		Next: next,
 	}

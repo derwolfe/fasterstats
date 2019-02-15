@@ -143,6 +143,7 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 		<div>
 		<div class="uk-pagination">
 			<p>Total: {{ .Total }}<p>
+			<p>Pages: {{ .TotalPages }}<p>
 			<p>Curr: {{ .Current }}<p>
 			<p>Next: {{ .Next }}<p>
 		</div>
