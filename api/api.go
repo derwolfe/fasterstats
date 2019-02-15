@@ -165,7 +165,7 @@ var resultsTable = `{{ define "content" }}
 	<h3>Competitions</h3>
 	<p class="uk-text-muted">*Bests are bolded</p>
 	<div class="uk-overflow-auto">
-		<table class="uk-table uk-table-divider uk-table-hover uk-table-responsive">
+		<table class="uk-table uk-table-divider uk-table-hover">
 			<thead>
 				<tr>
 					<th class="uk-table-expand">Meet Date</th>
