@@ -144,19 +144,19 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 
 var resultsTable = `{{ define "content" }}
 <article class="uk-article">
-	<h4 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h4>
+	<h1 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h1>
 	<h3>Statistics</h3>
 	<div class="uk-grid-divider uk-child-width-expand@s" uk-grid>
 		<div>
 			<ul class="uk-list">
-				<li>Best CJ: {{ .BestCJ }}</li>
-				<li>Best Snatch: {{ .BestSN }}</li>
-				<li>Best Total: {{ .BestTotal }}</li>
+				<li>Best CJ: {{ .BestCJ }} kg</li>
+				<li>Best Snatch: {{ .BestSN }} kg </li>
+				<li>Best Total: {{ .BestTotal }} kg</li>
 			<ul>
 		</div>
 		<div>
 			<ul class="uk-list">
-				<li>Most recent weight: {{ .RecentWeight }}</li>
+				<li>Most recent weight: {{ .RecentWeight }} kg</li>
 				<li>Avg # Snatches made: {{ .AvgSNMakes }}%</li>
 				<li>Avg # Clean & Jerks made: {{ .AvgCJMakes }}%</li>
 			</ul>
@@ -169,8 +169,8 @@ var resultsTable = `{{ define "content" }}
 			<thead>
 				<tr>
 					<th class="uk-table-expand">Meet Date</th>
-					<th class="uk-table-expand">Meet</th>
-					<th>Class@weight</th>
+					<th class="uk-text-nowrap">Meet (USAW link)</th>
+					<th class="uk-text-nowrap">Class@weight</th>
 					<th>SN1</th>
 					<th>SN2</th>
 					<th>SN3</th>
@@ -178,10 +178,10 @@ var resultsTable = `{{ define "content" }}
 					<th>CJ2</th>
 					<th>CJ3</th>
 					<th>Total</th>
-					<th>Best SN</th>
-					<th>Best CJ</th>
-					<th>SNs/3</th>
-					<th>CJs/3</th>
+					<th class="uk-text-nowrap">Best SN</th>
+					<th class="uk-text-nowrap">Best CJ</th>
+					<th class="uk-text-nowrap">SNs/3</th>
+					<th class="uk-text-nowrap">CJs/3</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -214,9 +214,9 @@ var resultsTable = `{{ define "content" }}
 {{ end }}`
 
 var searchForm = `{{define "searchForm" }}
-<form class="uk-search" action="/search" method="GET">
+<form class="uk-search uk-search-default" action="/search" method="GET">
 	<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter" required minlength=3>
-	<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+	<button class="uk-button" type="submit" value="Search">Search</button>
 </form>
 {{ end}}`
 
@@ -270,12 +270,12 @@ var landingPage = `<!doctype html>
 	</head>
 	<body>
 		<div class="uk-container">
-			<div class="d-flex flex-column align-content-center">
-				<h2 class="display align-self-center">bitofapressout</h1>
-				<p class="align-self-center">Enter a name, find a lifer from scraped USAW meet data</p>
-				<form class="form-inline align-self-center" action="/search" method="GET">
-					<input class="form-control mr-sm-2" name="name" type="search" placeholder="part of a name" aria-label="Search" required minlength=3>
-					<button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">Search</button>
+			<div class="uk-position-center">
+				<h2 class="">bitofapressout</h1>
+				<p class="">Enter a name, find a lifer from scraped USAW meet data</p>
+				<form class="uk-form" action="/search" method="GET">
+					<input class="uk-input" name="name" type="search" placeholder="part of a name" required minlength=3>
+					<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
 				</form>
 			</div>
 		</div>
