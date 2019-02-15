@@ -7,6 +7,8 @@ import (
 	"github.com/shopspring/decimal"
 	"log"
 	"strings"
+	"strconv"
+	"fmt"
 )
 
 func BuildDB(dbPath string) (*OurDB, error) {
@@ -20,12 +22,12 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		log.Fatal(err)
 	}
 
-	allNamesStmt, err := db.Prepare(`SELECT COUNT(*) FROM results WHERE lifter like $1 GROUP BY lifter, hometown ORDER BY lifter ASC`)
+	nameCtStmt, err := db.Prepare(`SELECT COUNT(DISTINCT lifter) FROM results WHERE lifter like $1`)
 	if err != nil {
 		return nil, err
 	}
 
-	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like $1 ORDER BY lifter ASC LIMIT 100, ?2`)
+	nameStmt, err := db.Prepare(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like $1 ORDER BY lifter ASC LIMIT $2 OFFSET $3`)
 	if err != nil {
 		return nil, err
 	}
@@ -128,25 +130,58 @@ type OurDB struct {
 	bestTotalQuery *sql.Stmt
 }
 
-func (o *OurDB) QueryNames(name string, offset int) ([]Lifter, error) {
+type LiftersResponse struct {
+	Lifters []Lifter
+	Total int64
+	Current int64
+	Next int64
+}
+
+func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	log.Printf("name: %v\n", name)
 	name = strings.Replace(name, " ", "%", -1)
 	nameLike := "%" + name + "%"
 
 	// get the number of results so we can compute pages. Max result number is 100 per page.
-	var ct int
-	err := o.nameCtQuery.QueryRow(nameLike).Scan(&ct)
+	var total int64
+	err := o.nameCtQuery.QueryRow(nameLike).Scan(&total)
 	if err != nil {
+		fmt.Printf("cw: %v", err)
 		return nil, err
 	}
 
-	rows, err := o.nameQuery.Query(nameLike, offset)
+	// if we found nothing return nothing and stop
+	if total == 0 {
+		resp := &LiftersResponse{
+			Lifters: nil,
+			Total: 0,
+			Current: 1,
+			Next: 1,
+		}
+		return resp, nil
+	}
+	fmt.Printf("t: %v", total)
+
+	// get the offset
+	pageLimit := int64(50)
+	var onum int64
+	if len(offset) != 0 {
+		onum, err = strconv.ParseInt(offset, 10, 64)
+		if err != nil {
+			log.Printf("failed to parse offset %v", offset)
+			return nil, err
+		}
+	} else {
+		onum = int64(0)
+	}
+
+	// get the names
+	rows, err := o.nameQuery.Query(nameLike, pageLimit, onum*pageLimit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	// get the length of results
 	var lifters []Lifter
 	for rows.Next() {
 		l := Lifter{}
@@ -158,9 +193,27 @@ func (o *OurDB) QueryNames(name string, offset int) ([]Lifter, error) {
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		return nil, err
 	}
-	return lifters, nil
+	fmt.Printf("rows: %v", lifters)
+	// there are 50 per page
+	numPages := total / 50
+	next := onum
+	if onum < numPages {
+		next++
+	}
+
+	// total is the number of pages
+	// current is the page being returned, if this had an offset, it would be the next page
+	resp := &LiftersResponse{
+		Lifters: lifters,
+		Total: total,
+		Current: onum,
+		Next: next,
+	}
+
+	return resp, nil
 }
 
 func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {

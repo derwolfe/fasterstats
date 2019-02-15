@@ -57,7 +57,9 @@ func (a API) Search(w http.ResponseWriter, r *http.Request) {
 		// there might be a page; if so try to use it to look up
 		offset := r.FormValue("offset")
 		found, err := a.db.QueryNames(name, offset)
+
 		if err != nil {
+			log.Printf("error fetching names: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("500 - Uh oh"))
 			return
@@ -127,20 +129,23 @@ body {
 {{ end }}`
 
 var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
-	{{ if eq (len .) 0 }}
+	{{ if eq .Total 0 }}
 		<p>No names found</p>
-	{{ end }}
-	{{ if gt (len .) 50 }}
-		<p>Too many results, please provide more letters</p>
-	{{ end }}
-	{{ if and (gt (len .) 0) (lt (len .) 50) }}
-		<ul class="list-group">
-			{{ range .}}
-				<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
-					<li class="list-group-item">{{ .Name }} - {{ .Hometown }}</li>
-				</a>
-			{{ end }}
-		</ul>
+	{{ else }}
+		<div>
+			<ul class="uk-list-group">
+				{{ range .Lifters }}
+					<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
+						<li class="list-group-item">{{ .Name }} - {{ .Hometown }}</li>
+					</a>
+				{{ end }}
+			</ul>
+		<div>
+		<div class="uk-pagination">
+			<p>Total: {{ .Total }}<p>
+			<p>Curr: {{ .Current }}<p>
+			<p>Next: {{ .Next }}<p>
+		</div>
 	{{ end }}
 </div>{{ end }}`
 
