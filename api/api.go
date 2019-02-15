@@ -169,8 +169,8 @@ var resultsTable = `{{ define "content" }}
 			<thead>
 				<tr>
 					<th class="uk-table-expand">Meet Date</th>
-					<th class="uk-table-expand">Meet (link to USAW)</th>
-					<th>Class@weight</th>
+					<th class="uk-text-nowrap">Meet (USAW link)</th>
+					<th class="uk-text-nowrap">Class@weight</th>
 					<th>SN1</th>
 					<th>SN2</th>
 					<th>SN3</th>
@@ -178,10 +178,10 @@ var resultsTable = `{{ define "content" }}
 					<th>CJ2</th>
 					<th>CJ3</th>
 					<th>Total</th>
-					<th>Best SN</th>
-					<th>Best CJ</th>
-					<th>SNs/3</th>
-					<th>CJs/3</th>
+					<th class="uk-text-nowrap">Best SN</th>
+					<th class="uk-text-nowrap">Best CJ</th>
+					<th class="uk-text-nowrap">SNs/3</th>
+					<th class="uk-text-nowrap">CJs/3</th>
 				</tr>
 			</thead>
 			<tbody>
