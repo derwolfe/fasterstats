@@ -132,8 +132,10 @@ type OurDB struct {
 
 type LiftersResponse struct {
 	Lifters []Lifter
+	Name string
 	Total int64
 	TotalPages int64
+	Pages []int64
 	Current int64
 	Next int64
 }
@@ -155,9 +157,10 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	if total == 0 {
 		resp := &LiftersResponse{
 			Lifters: nil,
+			Name: name,
 			Total: 0,
-			Current: 1,
-			Next: 1,
+			Current: 0,
+			Next: 0,
 		}
 		return resp, nil
 	}
@@ -198,11 +201,13 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	}
 
 	// there are 50 per page
-	numPages := total / 50
+	numPages := total / pageLimit
 	next := onum
 	if onum < numPages {
 		next++
 	}
+	pages := makeRange(0, numPages)
+	// generate a list of page numbers to add
 
 	// total is the number of pages
 	// current is the page being returned, if this had an offset, it would be the next page
@@ -212,8 +217,9 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 		TotalPages: numPages,
 		Current: onum,
 		Next: next,
+		Name: name,
+		Pages: pages,
 	}
-
 	return resp, nil
 }
 
@@ -312,4 +318,12 @@ func maxDec(x, y decimal.Decimal) decimal.Decimal {
 		return x
 	}
 	return y
+}
+
+func makeRange(min, max int64) []int64 {
+    a := make([]int64, max-min+int64(1))
+    for i := range a {
+        a[i] = min + int64(i)
+    }
+    return a
 }

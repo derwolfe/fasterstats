@@ -130,7 +130,9 @@ body {
 
 var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 	{{ if eq .Total 0 }}
-		<p>No names found</p>
+		<div>
+			<p>No names found</p>
+		</div>
 	{{ else }}
 		<div>
 			<ul class="uk-list-group">
@@ -141,12 +143,12 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 				{{ end }}
 			</ul>
 		<div>
-		<div class="uk-pagination">
-			<p>Total: {{ .Total }}<p>
-			<p>Pages: {{ .TotalPages }}<p>
-			<p>Curr: {{ .Current }}<p>
-			<p>Next: {{ .Next }}<p>
-		</div>
+		<ul class="uk-pagination">
+		{{ range .Pages }}
+			<a href="search?name={{ $.Name }}&offset={{ . }}">link</a>
+		{{ end }}
+		<p>Pages: {{ .TotalPages }}<p>
+		</ul>
 	{{ end }}
 </div>{{ end }}`
 
