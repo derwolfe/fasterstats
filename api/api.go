@@ -55,7 +55,8 @@ func (a API) Search(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// there might be a page; if so try to use it to look up
-		offset := r.FormValue("offset")
+		// this should always be a number XXX add validtion
+		offset := r.FormValue("page")
 		found, err := a.db.QueryNames(name, offset)
 
 		if err != nil {
