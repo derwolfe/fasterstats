@@ -136,6 +136,8 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 		</div>
 	{{ else }}
 		<div>
+			<p>Matching lifters: {{ .Total }}</P>
+			<p>Search term: {{ .Name }}</p>
 			<ul class="uk-list-group">
 				{{ range .Lifters }}
 					<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
@@ -146,10 +148,11 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 		<div>
 		<ul class="uk-pagination">
 		{{ range .Pages }}
-			<a href="search?name={{ $.Name }}&offset={{ . }}">link</a>
+			<li><a href="search?name={{ $.Name }}&page={{ . }}">{{ . }}</a></li>
 		{{ end }}
-		<p>Pages: {{ .TotalPages }}<p>
 		</ul>
+		<p>Current: {{ .Current }}</p>
+		<p>Pages: {{ .TotalPages }}<p>
 	{{ end }}
 </div>{{ end }}`
 
