@@ -286,9 +286,9 @@ var landingPage = `<!doctype html>
 		<div class="uk-container">
 			<div class="uk-position-center">
 				<h2 class="">bitofapressout</h1>
-				<p class="">Enter a name, find a lifer from scraped USAW meet data</p>
+				<p class="">Search USA weightlifting data</p>
 				<form class="uk-form" action="/search" method="GET">
-					<input class="uk-input" name="name" type="search" placeholder="part of a name" required minlength=3>
+					<input class="uk-input" name="name" type="search" placeholder="Search..." required minlength=3>
 					<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
 				</form>
 			</div>
