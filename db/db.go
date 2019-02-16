@@ -172,7 +172,8 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 		onum, err = strconv.ParseInt(offset, 10, 64)
 		if err != nil {
 			log.Printf("failed to parse offset %v", offset)
-			return nil, err
+			// go to page 0
+			onum = int64(0)
 		}
 	} else {
 		onum = int64(0)
