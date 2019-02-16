@@ -54,8 +54,13 @@ func (a API) Search(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("400 - Search name must be greater than 3 characters"))
 			return
 		}
-		found, err := a.db.QueryNames(name)
+		// there might be a page; if so try to use it to look up
+		// this should always be a number XXX add validtion
+		offset := r.FormValue("page")
+		found, err := a.db.QueryNames(name, offset)
+
 		if err != nil {
+			log.Printf("error fetching names: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("500 - Uh oh"))
 			return
@@ -125,20 +130,29 @@ body {
 {{ end }}`
 
 var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
-	{{ if eq (len .) 0 }}
-		<p>No names found</p>
-	{{ end }}
-	{{ if gt (len .) 50 }}
-		<p>Too many results, please provide more letters</p>
-	{{ end }}
-	{{ if and (gt (len .) 0) (lt (len .) 50) }}
-		<ul class="list-group">
-			{{ range .}}
-				<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
-					<li class="list-group-item">{{ .Name }} - {{ .Hometown }}</li>
-				</a>
-			{{ end }}
+	{{ if eq .Total 0 }}
+		<div>
+			<p>No names found</p>
+		</div>
+	{{ else }}
+		<div>
+			<p>Matching lifters: {{ .Total }}</P>
+			<p>Search term: {{ .Name }}</p>
+			<ul class="uk-list-group">
+				{{ range .Lifters }}
+					<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
+						<li class="list-group-item">{{ .Name }} - {{ .Hometown }}</li>
+					</a>
+				{{ end }}
+			</ul>
+		<div>
+		<ul class="uk-pagination">
+		{{ range .Pages }}
+			<li><a href="search?name={{ $.Name }}&page={{ . }}">{{ . }}</a></li>
+		{{ end }}
 		</ul>
+		<p>Current: {{ .Current }}</p>
+		<p>Pages: {{ .TotalPages }}<p>
 	{{ end }}
 </div>{{ end }}`
 
@@ -272,9 +286,9 @@ var landingPage = `<!doctype html>
 		<div class="uk-container">
 			<div class="uk-position-center">
 				<h2 class="">bitofapressout</h1>
-				<p class="">Enter a name, find a lifer from scraped USAW meet data</p>
+				<p class="">Search USA weightlifting data</p>
 				<form class="uk-form" action="/search" method="GET">
-					<input class="uk-input" name="name" type="search" placeholder="part of a name" required minlength=3>
+					<input class="uk-input" name="name" type="search" placeholder="Search..." required minlength=3>
 					<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
 				</form>
 			</div>
