@@ -116,9 +116,6 @@ var css = `{{ define "css" }}
 <!-- UIkit CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/css/uikit.min.css" />
 <style>
-a {
-	color: #1C242E;
-	}
 body {
 	font-family: sans-serif;
 	color: #1C242E;
