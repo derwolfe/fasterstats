@@ -131,7 +131,7 @@ type OurDB struct {
 }
 
 type PageInfo struct {
-	Offset, Display int
+	Display int
 }
 
 type LiftersResponse struct {
@@ -176,10 +176,14 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 		if err != nil {
 			log.Printf("failed to parse offset %v", offset)
 			// go to page 0
-			onum = int64(0)
+			onum = int64(1)
 		}
 	} else {
-		onum = int64(0)
+		onum = int64(1)
+	}
+	// page is meant to be min 1 for humans, offset is internal and should be 0-based
+	if onum >= 1 {
+		onum--
 	}
 
 	// get the names
@@ -327,7 +331,6 @@ func makePageInfoRange(min, max int) []PageInfo {
 	for i := range a {
 		v := min + i
 		a[i] = PageInfo{
-			Offset:  v,
 			Display: v + 1,
 		}
 	}

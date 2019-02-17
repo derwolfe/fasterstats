@@ -153,7 +153,7 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 			{{ else }}
 			<li>
 			{{ end }}
-				<a href="search?name={{ $.Name }}&page={{ .Offset }}">{{ .Display }}</a>
+				<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
 			</li>
 		{{ end }}
 		</ul>
