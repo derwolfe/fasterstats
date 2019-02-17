@@ -22,7 +22,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		log.Fatal(err)
 	}
 
-	nameCtStmt, err := db.Prepare(`SELECT COUNT(DISTINCT lifter) FROM results WHERE lifter like $1`)
+	nameCtStmt, err := db.Prepare(`SELECT SUM(ct) from (SELECT 1 as ct FROM results WHERE lifter like $1 GROUP BY hometown, lifter)`)
 	if err != nil {
 		return nil, err
 	}
