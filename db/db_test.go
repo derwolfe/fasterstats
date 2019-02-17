@@ -13,10 +13,10 @@ func TestQueryNames(t *testing.T) {
 	assert.Nil(t, err, "failed to build db")
 
 	// this relies on data in the DB!
-	lifters, err := db.QueryNames("francisco flores", "1")
+	r, err := db.QueryNames("francisco flores", "1")
 
 	assert.Nil(t, err, "query for names returned an error")
-	fmt.Printf("%v\n", lifters)
+	fmt.Printf("%v\n", r)
 }
 
 func TestQueryResults(t *testing.T) {
@@ -26,11 +26,11 @@ func TestQueryResults(t *testing.T) {
 	assert.Nil(t, err, "failed to build db")
 
 	// this relies on data in the DB!
-	lifters, err := db.QueryNames("chris wolfe", "1")
+	r, err := db.QueryNames("chris wolfe", "1")
 	assert.Nil(t, err, "query for names returned an error")
-	assert.NotEmpty(t, lifters, "no names returned")
+	assert.NotEmpty(t, r, "no names returned")
 
-	summary, err := db.QueryResults(lifters.Lifters[0].Name, lifters.Lifters[0].Hometown)
+	summary, err := db.QueryResults(r.Lifters[0].Name, r.Lifters[0].Hometown)
 	assert.Nil(t, err, "query for results failed")
 
 	assert.NotEmpty(t, summary.Results, "no results for lifter")
@@ -47,12 +47,12 @@ func TestQueryResultsLikeReplace(t *testing.T) {
 	assert.Nil(t, err, "failed to build db")
 
 	// this relies on data in the DB!
-	lifters, err := db.QueryNames("j bradley", "1")
+	r, err := db.QueryNames("j bradley", "1")
 	assert.Nil(t, err, "query for names returned an error")
-	assert.NotEmpty(t, lifters.Lifters, "no names returned")
+	assert.NotEmpty(t, r.Lifters, "no names returned")
 
 	pass := false
-	for _, l := range lifters.Lifters {
+	for _, l := range r.Lifters {
 		if l.Name == "Jessie Bradley" {
 			pass = true
 		}
