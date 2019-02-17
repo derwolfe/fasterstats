@@ -2,13 +2,13 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"log"
-	"strings"
 	"strconv"
-	"fmt"
+	"strings"
 )
 
 func BuildDB(dbPath string) (*OurDB, error) {
@@ -57,7 +57,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 
 	return &OurDB{
 		db:             db,
-		nameCtQuery:	nameCtStmt,
+		nameCtQuery:    nameCtStmt,
 		nameQuery:      nameStmt,
 		resultsQuery:   resultsStmt,
 		bestCJQuery:    bestCJ,
@@ -130,20 +130,22 @@ type OurDB struct {
 	bestTotalQuery *sql.Stmt
 }
 
+type PageInfo struct {
+	Display int
+}
+
 type LiftersResponse struct {
-	Lifters []Lifter
-	Name string
-	Total int64
-	TotalPages int64
-	Pages []int64
-	Current int64
-	Next int64
+	Lifters    []Lifter
+	Name       string
+	Total      int64
+	Pages      []PageInfo
+	Current    int64
+	Next       int64
 }
 
 func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	log.Printf("name: %v, offset: %v\n", name, offset)
-	name = strings.Replace(name, " ", "%", -1)
-	nameLike := "%" + name + "%"
+	nameLike := "%" + strings.Replace(name, " ", "%", -1) + "%"
 
 	// get the number of results so we can compute pages. Max result number is 100 per page.
 	var total int64
@@ -156,11 +158,12 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	// if we found nothing return nothing and stop
 	if total == 0 {
 		resp := &LiftersResponse{
-			Lifters: nil,
-			Name: name,
-			Total: 0,
-			Current: 0,
-			Next: 0,
+			Lifters:    nil,
+			Name:       name,
+			Total:      0,
+			Current:    0,
+			Next:       0,
+			Pages:      nil,
 		}
 		return resp, nil
 	}
@@ -173,10 +176,14 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 		if err != nil {
 			log.Printf("failed to parse offset %v", offset)
 			// go to page 0
-			onum = int64(0)
+			onum = int64(1)
 		}
 	} else {
-		onum = int64(0)
+		onum = int64(1)
+	}
+	// page is meant to be min 1 for humans, offset is internal and should be 0-based
+	if onum >= 1 {
+		onum--
 	}
 
 	// get the names
@@ -207,19 +214,16 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	if onum < numPages {
 		next++
 	}
-	pages := makeRange(0, numPages)
-	// generate a list of page numbers to add
 
 	// total is the number of pages
 	// current is the page being returned, if this had an offset, it would be the next page
 	resp := &LiftersResponse{
-		Lifters: lifters,
-		Total: total,
-		TotalPages: numPages,
-		Current: onum,
-		Next: next,
-		Name: name,
-		Pages: pages,
+		Lifters:    lifters,
+		Total:      total,
+		Current:    onum + 1 ,
+		Next:       next,
+		Name:       name,
+		Pages:      makePageInfoRange(0, int(numPages)),
 	}
 	return resp, nil
 }
@@ -321,10 +325,14 @@ func maxDec(x, y decimal.Decimal) decimal.Decimal {
 	return y
 }
 
-func makeRange(min, max int64) []int64 {
-    a := make([]int64, max-min+int64(1))
-    for i := range a {
-        a[i] = min + int64(i)
-    }
-    return a
+func makePageInfoRange(min, max int) []PageInfo {
+	// make a range of numbers, then build the page info from it
+	a := make([]PageInfo, max-min+1)
+	for i := range a {
+		v := min + i
+		a[i] = PageInfo{
+			Display: v + 1,
+		}
+	}
+	return a
 }
