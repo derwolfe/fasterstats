@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"log"
 	"strconv"
@@ -228,6 +227,14 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	return resp, nil
 }
 
+type LifterNotFoundError struct {
+	Name string
+}
+
+func (e LifterNotFoundError) Error() string {
+	return fmt.Sprintf("lifter not found: %v", e.Name)
+}
+
 func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	log.Printf("name: %v, hometown: %v\n", name, hometown)
 	rows, err := o.resultsQuery.Query(name, hometown)
@@ -255,8 +262,9 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		return nil, err
 	}
 
+	// return lifter not found
 	if len(results) == 0 {
-		return nil, errors.New("No results")
+		return nil, LifterNotFoundError{Name: name}
 	}
 
 	rs := ResultsSummary{Results: results}

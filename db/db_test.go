@@ -81,3 +81,15 @@ func TestQueryCountAccurate(t *testing.T) {
 	assert.Equal(t, len(r.Lifters), 50, "two r not returned for kyle brown")
 	assert.True(t, r.Total > 50, "the total was not larger than a page boundary")
 }
+
+func Test404Missinglifter(t *testing.T) {
+	db, err := BuildDB("../results.db")
+	defer db.Close()
+
+	assert.Nil(t, err, "failed to build db")
+
+	_, err = db.QueryResults("fffffff", "fffffff")
+	assert.NotNil(t, err, "")
+
+	assert.Equal(t, err.Error(), "lifter not found: fffffff")
+}
