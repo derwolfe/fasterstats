@@ -59,3 +59,18 @@ func TestQueryResultsLikeReplace(t *testing.T) {
 	}
 	assert.True(t, pass, "lifter not found")
 }
+
+func TestQueryCountAccurate(t *testing.T) {
+	db, err := BuildDB("../results.db")
+	defer db.Close()
+
+	assert.Nil(t, err, "failed to build db")
+
+	// this relies on data in the DB!
+	r, err := db.QueryNames("kyle brown", "1")
+	assert.Nil(t, err, "query for names returned an error")
+	assert.NotEmpty(t, r.Lifters, "no names returned")
+
+	assert.Equal(t, len(r.Lifters), 2, "two r not returned for kyle brown")
+	assert.Equal(t, r.Total, 1, "the total was not two")
+}
