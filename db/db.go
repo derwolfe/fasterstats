@@ -138,7 +138,6 @@ type LiftersResponse struct {
 	Lifters    []Lifter
 	Name       string
 	Total      int64
-	TotalPages int64
 	Pages      []PageInfo
 	Current    int64
 	Next       int64
@@ -164,7 +163,6 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 			Total:      0,
 			Current:    0,
 			Next:       0,
-			TotalPages: 0,
 			Pages:      nil,
 		}
 		return resp, nil
@@ -213,19 +211,15 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 		next++
 	}
 
-	pages := makePageInfoRange(0, int(numPages))
-	// generate a list of page numbers to add
-
 	// total is the number of pages
 	// current is the page being returned, if this had an offset, it would be the next page
 	resp := &LiftersResponse{
 		Lifters:    lifters,
 		Total:      total,
-		TotalPages: numPages,
-		Current:    onum,
+		Current:    onum + 1 ,
 		Next:       next,
 		Name:       name,
-		Pages:      pages,
+		Pages:      makePageInfoRange(0, int(numPages)),
 	}
 	return resp, nil
 }
