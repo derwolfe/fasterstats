@@ -81,3 +81,19 @@ func TestQueryCountAccurate(t *testing.T) {
 	assert.Equal(t, len(r.Lifters), 50, "two r not returned for kyle brown")
 	assert.True(t, r.Total > 50, "the total was not larger than a page boundary")
 }
+
+func TestQueryWorksWhenZero(t *testing.T) {
+	db, err := BuildDB("../results.db")
+	defer db.Close()
+
+	assert.Nil(t, err, "failed to build db")
+
+	// this relies on data in the DB!
+	r, err := db.QueryNames("foooooo", "1")
+	assert.Nil(t, err, "query for names returned an error")
+
+	assert.Equal(t, len(r.Lifters), 0, "two r not returned for kyle brown")
+	assert.Equal(t, r.Total, int64(0), "the total was not two")
+
+	assert.Nil(t, err, "query for names returned an error")
+}
