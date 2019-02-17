@@ -22,7 +22,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		log.Fatal(err)
 	}
 
-	nameCtStmt, err := db.Prepare(`SELECT SUM(ct) from (SELECT 1 as ct FROM results WHERE lifter like $1 GROUP BY hometown, lifter)`)
+	nameCtStmt, err := db.Prepare(`SELECT IFNULL(SUM(ct), 0) from (SELECT 1 as ct FROM results WHERE lifter like $1 GROUP BY hometown, lifter)`)
 	if err != nil {
 		return nil, err
 	}
@@ -135,12 +135,12 @@ type PageInfo struct {
 }
 
 type LiftersResponse struct {
-	Lifters    []Lifter
-	Name       string
-	Total      int64
-	Pages      []PageInfo
-	Current    int64
-	Next       int64
+	Lifters []Lifter
+	Name    string
+	Total   int64
+	Pages   []PageInfo
+	Current int64
+	Next    int64
 }
 
 func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
@@ -158,12 +158,12 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	// if we found nothing return nothing and stop
 	if total == 0 {
 		resp := &LiftersResponse{
-			Lifters:    nil,
-			Name:       name,
-			Total:      0,
-			Current:    0,
-			Next:       0,
-			Pages:      nil,
+			Lifters: nil,
+			Name:    name,
+			Total:   0,
+			Current: 0,
+			Next:    0,
+			Pages:   nil,
 		}
 		return resp, nil
 	}
@@ -218,12 +218,12 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	// total is the number of pages
 	// current is the page being returned, if this had an offset, it would be the next page
 	resp := &LiftersResponse{
-		Lifters:    lifters,
-		Total:      total,
-		Current:    onum + 1 ,
-		Next:       next,
-		Name:       name,
-		Pages:      makePageInfoRange(0, int(numPages)),
+		Lifters: lifters,
+		Total:   total,
+		Current: onum + 1,
+		Next:    next,
+		Name:    name,
+		Pages:   makePageInfoRange(0, int(numPages)),
 	}
 	return resp, nil
 }
