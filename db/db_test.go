@@ -88,12 +88,9 @@ func TestQueryWorksWhenZero(t *testing.T) {
 
 	assert.Nil(t, err, "failed to build db")
 
-	// this relies on data in the DB!
 	r, err := db.QueryNames("foooooo", "1")
 	assert.Nil(t, err, "query for names returned an error")
 
-	assert.Equal(t, len(r.Lifters), 0, "two r not returned for kyle brown")
-	assert.Equal(t, r.Total, int64(0), "the total was not two")
-
-	assert.Nil(t, err, "query for names returned an error")
+	assert.Equal(t, len(r.Lifters), 0, "no results should be returned")
+	assert.Equal(t, r.Total, int64(0), "the total was non-zero")
 }
