@@ -230,7 +230,7 @@ var resultsTable = `{{ define "content" }}
 
 var searchForm = `{{define "searchForm" }}
 <form class="uk-search uk-search-default" action="/search" method="GET">
-	<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter" required minlength=3>
+	<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter by name" required minlength=3>
 	<button class="uk-button" type="submit" value="Search">Search</button>
 </form>
 {{ end}}`
@@ -249,7 +249,7 @@ var navbar = `{{define "navbar" }}
 			<div class="uk-margin-right">
 				<form class="uk-search uk-search-default uk-search-navbar" action="/search" method="GET">
 					<span class="uk-search-icon-flip" uk-search-icon></span>
-					<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter" required minlength=3 autofocus>
+					<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter by name" required minlength=3 autofocus>
 				</form>
  	       </div>
     </div>
@@ -289,7 +289,7 @@ var landingPage = `<!doctype html>
 				<h2 class="">bitofapressout</h1>
 				<p class="">Search USA Weightlifting data</p>
 				<form class="uk-form" action="/search" method="GET">
-					<input class="uk-input" name="name" type="search" placeholder="Search..." required minlength=3>
+					<input class="uk-input" name="name" type="search" placeholder="Find a lifter by name" required minlength=3>
 					<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
 				</form>
 			</div>
