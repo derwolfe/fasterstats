@@ -160,6 +160,8 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 			Total: 0,
 			Current: 0,
 			Next: 0,
+			TotalPages: 0,
+			Pages: nil,
 		}
 		return resp, nil
 	}
