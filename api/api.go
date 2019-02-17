@@ -148,7 +148,7 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 		<div>
 		<ul class="uk-pagination">
 		{{ range .Pages }}
-			<li><a href="search?name={{ $.Name }}&page={{ . }}">{{ . }}</a></li>
+			<li><a href="search?name={{ $.Name }}&page={{ .Offset }}">{{ .Display }}</a></li>
 		{{ end }}
 		</ul>
 		<p>Current: {{ .Current }}</p>

@@ -2,13 +2,13 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"log"
-	"strings"
 	"strconv"
-	"fmt"
+	"strings"
 )
 
 func BuildDB(dbPath string) (*OurDB, error) {
@@ -57,7 +57,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 
 	return &OurDB{
 		db:             db,
-		nameCtQuery:	nameCtStmt,
+		nameCtQuery:    nameCtStmt,
 		nameQuery:      nameStmt,
 		resultsQuery:   resultsStmt,
 		bestCJQuery:    bestCJ,
@@ -130,14 +130,18 @@ type OurDB struct {
 	bestTotalQuery *sql.Stmt
 }
 
+type PageInfo struct {
+	Offset, Display int
+}
+
 type LiftersResponse struct {
-	Lifters []Lifter
-	Name string
-	Total int64
+	Lifters    []Lifter
+	Name       string
+	Total      int64
 	TotalPages int64
-	Pages []int64
-	Current int64
-	Next int64
+	Pages      []PageInfo
+	Current    int64
+	Next       int64
 }
 
 func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
@@ -155,13 +159,13 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	// if we found nothing return nothing and stop
 	if total == 0 {
 		resp := &LiftersResponse{
-			Lifters: nil,
-			Name: name,
-			Total: 0,
-			Current: 0,
-			Next: 0,
+			Lifters:    nil,
+			Name:       name,
+			Total:      0,
+			Current:    0,
+			Next:       0,
 			TotalPages: 0,
-			Pages: nil,
+			Pages:      nil,
 		}
 		return resp, nil
 	}
@@ -208,19 +212,20 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	if onum < numPages {
 		next++
 	}
-	pages := makeRange(0, numPages)
+
+	pages := makePageInfoRange(0, int(numPages))
 	// generate a list of page numbers to add
 
 	// total is the number of pages
 	// current is the page being returned, if this had an offset, it would be the next page
 	resp := &LiftersResponse{
-		Lifters: lifters,
-		Total: total,
+		Lifters:    lifters,
+		Total:      total,
 		TotalPages: numPages,
-		Current: onum,
-		Next: next,
-		Name: name,
-		Pages: pages,
+		Current:    onum,
+		Next:       next,
+		Name:       name,
+		Pages:      pages,
 	}
 	return resp, nil
 }
@@ -322,10 +327,15 @@ func maxDec(x, y decimal.Decimal) decimal.Decimal {
 	return y
 }
 
-func makeRange(min, max int64) []int64 {
-    a := make([]int64, max-min+int64(1))
-    for i := range a {
-        a[i] = min + int64(i)
-    }
-    return a
+func makePageInfoRange(min, max int) []PageInfo {
+	// make a range of numbers, then build the page info from it
+	a := make([]PageInfo, max-min+1)
+	for i := range a {
+		v := min + i
+		a[i] = PageInfo{
+			Offset:  v,
+			Display: v + 1,
+		}
+	}
+	return a
 }
