@@ -71,12 +71,9 @@ func TestQueryCountAccurate(t *testing.T) {
 	assert.Nil(t, err, "query for names returned an error")
 
 	assert.Equal(t, len(r.Lifters), 2, "two r not returned for kyle brown")
-	assert.Equal(t, r.Total, 2, "the total was not two")
+	assert.Equal(t, r.Total, int64(2), "the total was not two")
 
-	// let's also test that when we hit a page boundary we still get an accurate count
-	assert.Nil(t, err, "failed to build db")
-
-		// this relies on data in the DB!
+	// this relies on data in the DB!
 	r, err = db.QueryNames("steph", "1")
 	assert.Nil(t, err, "query for names returned an error")
 
