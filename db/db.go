@@ -219,7 +219,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	// current is the page being returned, if this had an offset, it would be the next page
 	resp := &LiftersResponse{
 		Lifters:    lifters,
-		Total:      int64(len(lifters)),
+		Total:      total,
 		Current:    onum + 1 ,
 		Next:       next,
 		Name:       name,
