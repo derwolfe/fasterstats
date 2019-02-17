@@ -142,8 +142,7 @@ type LiftersResponse struct {
 
 func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	log.Printf("name: %v, offset: %v\n", name, offset)
-	name = strings.Replace(name, " ", "%", -1)
-	nameLike := "%" + name + "%"
+	nameLike := "%" + strings.Replace(name, " ", "%", -1) + "%"
 
 	// get the number of results so we can compute pages. Max result number is 100 per page.
 	var total int64
