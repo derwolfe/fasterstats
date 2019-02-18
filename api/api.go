@@ -22,12 +22,10 @@ func NewAPI(db *db.OurDB) *API {
 	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
 	lifts.Parse(css)
 	lifts.Parse(navbar)
-	lifts.Parse(searchForm)
 	lifts.Parse(resultsTable)
 
 	// names
 	names := template.Must(template.New("liftingResults").Parse(liftingResults))
-	names.Parse(searchForm)
 	names.Parse(navbar)
 	names.Parse(css)
 	names.Parse(searchNamesResults)
@@ -35,7 +33,6 @@ func NewAPI(db *db.OurDB) *API {
 	// search form
 	search := template.Must(template.New("landingPage").Parse(landingPage))
 	search.Parse(css)
-	search.Parse(searchForm)
 	search.Parse(searchNamesResults)
 
 	return &API{db: db, searchPage: search, namesPage: names, liftersPage: lifts}
@@ -261,13 +258,6 @@ var resultsTable = `{{ define "content" }}
 	</div>
 </div>
 {{ end }}`
-
-var searchForm = `{{define "searchForm" }}
-<form class="uk-search uk-search-default" action="/search" method="GET">
-	<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter by name" required minlength=3>
-	<button class="uk-button" type="submit" value="Search">Search</button>
-</form>
-{{ end}}`
 
 var navbar = `{{define "navbar" }}
 <nav class="uk-navbar-container uk-margin" uk-navbar>
