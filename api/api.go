@@ -139,6 +139,7 @@ var searchNamesResults = `{{ define "content" }}<div class="margin-top">
 
 			<p>Found {{ .Total }} matching lifters</li>
 
+			{{ if (ne .TotalPages .Current)}}
 			<ul class="uk-pagination uk-margin">
 			{{ range .Pages }}
 				{{ if (eq .Display $.Current)}}
@@ -150,6 +151,7 @@ var searchNamesResults = `{{ define "content" }}<div class="margin-top">
 				</li>
 			{{ end }}
 			</ul>
+			{{ end }}
 		</div>
 		<hr>
 
@@ -165,6 +167,7 @@ var searchNamesResults = `{{ define "content" }}<div class="margin-top">
 
 		<hr>
 
+		{{ if (ne .TotalPages .Current)}}
 		<div>
 			<ul class="uk-pagination uk-margin">
 			{{ range .Pages }}
@@ -178,6 +181,7 @@ var searchNamesResults = `{{ define "content" }}<div class="margin-top">
 			{{ end }}
 			</ul>
 		</div>
+		{{ end }}
 	{{ end }}
 </div>{{ end }}`
 
