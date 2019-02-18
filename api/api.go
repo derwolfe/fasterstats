@@ -132,28 +132,38 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 			<p>No names found</p>
 		</div>
 	{{ else }}
-		<div>
-			<p>Matching lifters: {{ .Total }}</P>
-			<p>Search term: {{ .Name }}</p>
-			<ul class="uk-list-group">
+		<div class="">
+			<div class="uk-card">
+				<ul class="uk-card-body uk-list">
+					<li>Matching lifters: {{ .Total }}</li>
+					<li>Searched for {{ .Name }}</li>
+				</ul>
+			</div>
+
+			<div>
 				{{ range .Lifters }}
 					<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
-						<li class="list-group-item">{{ .Name }} - {{ .Hometown }}</li>
+						<div class="uk-card">
+							<h4 class="uk-card-title">{{ .Name }} - {{ .Hometown }}</h3>
+						</div>
 					</a>
 				{{ end }}
-			</ul>
+			</div>
+
+			<div>
+				<ul class="uk-pagination uk-margin">
+				{{ range .Pages }}
+					{{ if (eq .Display $.Current)}}
+					<li class="uk-active">
+					{{ else }}
+					<li>
+					{{ end }}
+						<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
+					</li>
+				{{ end }}
+				</ul>
+			</div>
 		<div>
-		<ul class="uk-pagination uk-margin">
-		{{ range .Pages }}
-			{{ if (eq .Display $.Current)}}
-			<li class="uk-active">
-			{{ else }}
-			<li>
-			{{ end }}
-				<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
-			</li>
-		{{ end }}
-		</ul>
 	{{ end }}
 </div>{{ end }}`
 
