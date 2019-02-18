@@ -22,12 +22,10 @@ func NewAPI(db *db.OurDB) *API {
 	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
 	lifts.Parse(css)
 	lifts.Parse(navbar)
-	lifts.Parse(searchForm)
 	lifts.Parse(resultsTable)
 
 	// names
 	names := template.Must(template.New("liftingResults").Parse(liftingResults))
-	names.Parse(searchForm)
 	names.Parse(navbar)
 	names.Parse(css)
 	names.Parse(searchNamesResults)
@@ -35,7 +33,6 @@ func NewAPI(db *db.OurDB) *API {
 	// search form
 	search := template.Must(template.New("landingPage").Parse(landingPage))
 	search.Parse(css)
-	search.Parse(searchForm)
 	search.Parse(searchNamesResults)
 
 	return &API{db: db, searchPage: search, namesPage: names, liftersPage: lifts}
@@ -126,38 +123,75 @@ body {
 </style>
 {{ end }}`
 
-var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
+var searchNamesResults = `{{ define "content" }}
+<div class="uk-margin" uk-margin>
+	<form class="uk-form" action="/search" method="GET" uk-form>
+		<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" value="{{ .Name }}" required minlength=3 autofocus>
+		<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
+	</form>
+</div>
+
+<div class="uk-card">
 	{{ if eq .Total 0 }}
-		<div>
-			<p>No names found</p>
-		</div>
+		<p> No lifters found</p>
 	{{ else }}
-		<div>
-			<p>Matching lifters: {{ .Total }}</P>
-			<p>Search term: {{ .Name }}</p>
-			<ul class="uk-list-group">
-				{{ range .Lifters }}
-					<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
-						<li class="list-group-item">{{ .Name }} - {{ .Hometown }}</li>
-					</a>
+		<p>Found {{ .Total }} matching lifters</li>
+
+		{{ if (ne .TotalPages 1)}}
+			<ul class="uk-pagination uk-margin">
+			{{ range .Pages }}
+				{{ if (eq .Display $.Current)}}
+					<li class="uk-active">
+				{{ else }}
+					<li>
 				{{ end }}
-			</ul>
-		<div>
-		<ul class="uk-pagination uk-margin">
-		{{ range .Pages }}
-			{{ if (eq .Display $.Current)}}
-			<li class="uk-active">
-			{{ else }}
-			<li>
-			{{ end }}
 				<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
-			</li>
+				</li>
+			{{ end }}
+			</ul>
 		{{ end }}
-		</ul>
+
+		<hr>
+
+		<div>
+			{{ range .Lifters }}
+				<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
+					<div class="uk-card">
+						<h4 class="uk-card-title">{{ .Name }} - {{ .Hometown }}</h3>
+					</div>
+				</a>
+			{{ end }}
+		</div>
+
+		<hr>
+
+		{{ if (ne .TotalPages 1)}}
+		<div>
+			<ul class="uk-pagination uk-margin">
+			{{ range .Pages }}
+				{{ if (eq .Display $.Current)}}
+					<li class="uk-active">
+				{{ else }}
+					<li>
+				{{ end }}
+					<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
+				</li>
+			{{ end }}
+			</ul>
+		</div>
+		{{ end }}
+
 	{{ end }}
 </div>{{ end }}`
 
 var resultsTable = `{{ define "content" }}
+<div class="uk-margin" uk-margin>
+	<form class="uk-form" action="/search" method="GET" uk-form>
+		<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" required minlength=3 autofocus>
+		<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
+	</form>
+</div>
+
 <article class="uk-article">
 	<h1 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h1>
 	<h3>Statistics</h3>
@@ -228,31 +262,14 @@ var resultsTable = `{{ define "content" }}
 </div>
 {{ end }}`
 
-var searchForm = `{{define "searchForm" }}
-<form class="uk-search uk-search-default" action="/search" method="GET">
-	<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter by name" required minlength=3>
-	<button class="uk-button" type="submit" value="Search">Search</button>
-</form>
-{{ end}}`
-
 var navbar = `{{define "navbar" }}
 <nav class="uk-navbar-container uk-margin" uk-navbar>
-
-    <div class="nav-overlay uk-navbar-left uk-margin-left">
-        <ul class="uk-navbar-nav">
-					<li class="uk-active"><a href="/">Home</a></li>
-        </ul>
-    </div>
-
-    <div class="nav-overlay uk-navbar-right">
-		<div>
-			<div class="uk-margin-right">
-				<form class="uk-search uk-search-default uk-search-navbar" action="/search" method="GET">
-					<span class="uk-search-icon-flip" uk-search-icon></span>
-					<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter by name" required minlength=3 autofocus>
-				</form>
+	<div class="nav-overlay uk-navbar-left">
+		<div class="uk-navbar-nav">
+			<div class="uk-margin-left">
  	       </div>
-    </div>
+	</div>
+
 </nav>
 {{ end }}`
 
@@ -264,9 +281,10 @@ var liftingResults = `<!doctype html>
 		{{ template "css"}}
 	</head>
 	<body>
-		{{ template "navbar" }}
 		<div class="uk-container">
-			{{ template "content" .}}
+			<div class="uk-margin-top">
+				{{ template "content" .}}
+			</div>
 		</div>
 
 		<!-- UIkit JS -->
@@ -288,10 +306,12 @@ var landingPage = `<!doctype html>
 			<div class="uk-position-center">
 				<h2 class="">bitofapressout</h1>
 				<p class="">Search USA Weightlifting data</p>
-				<form class="uk-form" action="/search" method="GET">
-					<input class="uk-input" name="name" type="search" placeholder="Find a lifter by name" required minlength=3>
-					<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
-				</form>
+				<div class="uk-margin" uk-margin>
+					<form class="uk-form" action="/search" method="GET" uk-form>
+						<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" required minlength=3 autofocus>
+						<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
+					</form>
+				</div>
 			</div>
 		</div>
 		<!-- UIkit JS -->

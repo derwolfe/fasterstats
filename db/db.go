@@ -135,12 +135,12 @@ type PageInfo struct {
 }
 
 type LiftersResponse struct {
-	Lifters []Lifter
-	Name    string
-	Total   int64
-	Pages   []PageInfo
-	Current int64
-	Next    int64
+	Lifters    []Lifter
+	Name       string
+	Total      int64
+	Pages      []PageInfo
+	Current    int64
+	TotalPages int64
 }
 
 func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
@@ -158,12 +158,12 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	// if we found nothing return nothing and stop
 	if total == 0 {
 		resp := &LiftersResponse{
-			Lifters: nil,
-			Name:    name,
-			Total:   0,
-			Current: 0,
-			Next:    0,
-			Pages:   nil,
+			Lifters:    nil,
+			Name:       name,
+			Total:      0,
+			Current:    0,
+			TotalPages: 0,
+			Pages:      nil,
 		}
 		return resp, nil
 	}
@@ -210,20 +210,17 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 
 	// there are 50 per page
 	numPages := total / pageLimit
-	next := onum
-	if onum < numPages {
-		next++
-	}
+	pages := makePageInfoRange(0, int(numPages))
 
 	// total is the number of pages
 	// current is the page being returned, if this had an offset, it would be the next page
 	resp := &LiftersResponse{
-		Lifters: lifters,
-		Total:   total,
-		Current: onum + 1,
-		Next:    next,
-		Name:    name,
-		Pages:   makePageInfoRange(0, int(numPages)),
+		Lifters:    lifters,
+		Total:      total,
+		Current:    onum + 1,
+		Name:       name,
+		Pages:      pages,
+		TotalPages: int64(len(pages)),
 	}
 	return resp, nil
 }
