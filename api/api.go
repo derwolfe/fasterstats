@@ -185,7 +185,6 @@ var searchNamesResults = `{{ define "content" }}<div class="margin-top">
 </div>{{ end }}`
 
 var resultsTable = `{{ define "content" }}
-
 <div class="uk-margin" uk-margin>
 	<form class="uk-form" action="/search" method="GET" uk-form>
 		<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" required minlength=3 autofocus>
@@ -290,7 +289,9 @@ var liftingResults = `<!doctype html>
 	</head>
 	<body>
 		<div class="uk-container">
-			{{ template "content" .}}
+			<div class="uk-margin-top">
+				{{ template "content" .}}
+			</div>
 		</div>
 
 		<!-- UIkit JS -->
