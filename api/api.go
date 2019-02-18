@@ -139,6 +139,18 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 					<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter by name" value="{{ .Name }}" required minlength=3 autofocus>
 				</form>
 				<p>Found {{ .Total }} matching lifters</li>
+				<div>
+				<ul class="uk-pagination uk-margin">
+				{{ range .Pages }}
+					{{ if (eq .Display $.Current)}}
+					<li class="uk-active">
+					{{ else }}
+					<li>
+					{{ end }}
+						<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
+					</li>
+				{{ end }}
+				</ul>
 			</div>
 			<hr>
 
@@ -151,7 +163,7 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 					</a>
 				{{ end }}
 			</div>
-
+			<hr>
 			<div>
 				<ul class="uk-pagination uk-margin">
 				{{ range .Pages }}
