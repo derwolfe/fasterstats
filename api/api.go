@@ -123,67 +123,66 @@ body {
 </style>
 {{ end }}`
 
-var searchNamesResults = `{{ define "content" }}<div class="margin-top">
+var searchNamesResults = `
+{{ define "content" }}
+<div class="uk-margin" uk-margin>
+	<form class="uk-form" action="/search" method="GET" uk-form>
+		<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" value="{{ .Name }}" required minlength=3 autofocus>
+		<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
+	</form>
+</div>
+
+<div class="uk-card">
 	{{ if eq .Total 0 }}
-	<div>
-		<p>No names found</p>
-	</div>
+		<p> No lifters found</p>
 	{{ else }}
-		<div class="uk-card">
-			<div class="uk-margin" uk-margin>
-				<form class="uk-form" action="/search" method="GET" uk-form>
-					<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" value="{{ .Name }}" required minlength=3 autofocus>
-					<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
-				</form>
-			</div>
+		<p>Found {{ .Total }} matching lifters</li>
 
-			<p>Found {{ .Total }} matching lifters</li>
-
-			{{ if (ne .TotalPages .Current)}}
-			<ul class="uk-pagination uk-margin">
-			{{ range .Pages }}
-				{{ if (eq .Display $.Current)}}
+		{{ if (ne .TotalPages 1)}}
+		<ul class="uk-pagination uk-margin">
+		{{ range .Pages }}
+			{{ if (eq .Display $.Current)}}
 				<li class="uk-active">
-				{{ else }}
+			{{ else }}
 				<li>
-				{{ end }}
-					<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
-				</li>
 			{{ end }}
-			</ul>
-			{{ end }}
-		</div>
-		<hr>
-
-		<div>
-			{{ range .Lifters }}
-				<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
-					<div class="uk-card">
-						<h4 class="uk-card-title">{{ .Name }} - {{ .Hometown }}</h3>
-					</div>
-				</a>
-			{{ end }}
-		</div>
-
-		<hr>
-
-		{{ if (ne .TotalPages .Current)}}
-		<div>
-			<ul class="uk-pagination uk-margin">
-			{{ range .Pages }}
-				{{ if (eq .Display $.Current)}}
-				<li class="uk-active">
-				{{ else }}
-				<li>
-				{{ end }}
-					<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
-				</li>
-			{{ end }}
-			</ul>
-		</div>
+			<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
+			</li>
 		{{ end }}
+		</ul>
 	{{ end }}
-</div>{{ end }}`
+</div>
+<hr>
+
+<div>
+	{{ range .Lifters }}
+		<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
+			<div class="uk-card">
+				<h4 class="uk-card-title">{{ .Name }} - {{ .Hometown }}</h3>
+			</div>
+		</a>
+	{{ end }}
+</div>
+<hr>
+
+	{{ if (ne .TotalPages 1)}}
+	<div>
+		<ul class="uk-pagination uk-margin">
+		{{ range .Pages }}
+			{{ if (eq .Display $.Current)}}
+				<li class="uk-active">
+			{{ else }}
+				<li>
+			{{ end }}
+				<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
+			</li>
+		{{ end }}
+		</ul>
+	</div>
+	{{ end }}
+	{{ end }}
+</div>
+{{ end }}`
 
 var resultsTable = `{{ define "content" }}
 <div class="uk-margin" uk-margin>
