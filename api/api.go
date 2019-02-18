@@ -133,10 +133,14 @@ var searchNamesResults = `{{ define "content" }}<div class="w-75 p-3 mx-auto">
 		</div>
 	{{ else }}
 		<div class="">
+			<form class="uk-search uk-search-default uk-search-navbar" action="/search" method="GET">
+				<span class="uk-search-icon-flip" uk-search-icon></span>
+				<input class="uk-search-input" name="name" type="search" placeholder="Find a lifter by name" value="{{ .Name }}" required minlength=3 autofocus>
+			</form>
+
 			<div class="uk-card">
 				<ul class="uk-card-body uk-list">
 					<li>Matching lifters: {{ .Total }}</li>
-					<li>Searched for {{ .Name }}</li>
 				</ul>
 			</div>
 
