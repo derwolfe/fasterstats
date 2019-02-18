@@ -307,10 +307,12 @@ var landingPage = `<!doctype html>
 			<div class="uk-position-center">
 				<h2 class="">bitofapressout</h1>
 				<p class="">Search USA Weightlifting data</p>
-				<form class="uk-form" action="/search" method="GET">
-					<input class="uk-input" name="name" type="search" placeholder="Find a lifter by name" required minlength=3>
-					<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
-				</form>
+				<div class="uk-margin" uk-margin>
+					<form class="uk-form" action="/search" method="GET" uk-form>
+						<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" required minlength=3 autofocus>
+						<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
+					</form>
+				</div>
 			</div>
 		</div>
 		<!-- UIkit JS -->
