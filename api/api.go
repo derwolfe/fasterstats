@@ -123,8 +123,7 @@ body {
 </style>
 {{ end }}`
 
-var searchNamesResults = `
-{{ define "content" }}
+var searchNamesResults = `{{ define "content" }}
 <div class="uk-margin" uk-margin>
 	<form class="uk-form" action="/search" method="GET" uk-form>
 		<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" value="{{ .Name }}" required minlength=3 autofocus>
@@ -139,50 +138,51 @@ var searchNamesResults = `
 		<p>Found {{ .Total }} matching lifters</li>
 
 		{{ if (ne .TotalPages 1)}}
-		<ul class="uk-pagination uk-margin">
-		{{ range .Pages }}
-			{{ if (eq .Display $.Current)}}
-				<li class="uk-active">
-			{{ else }}
-				<li>
-			{{ end }}
-			<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
-			</li>
-		{{ end }}
-		</ul>
-	{{ end }}
-</div>
-<hr>
-
-<div>
-	{{ range .Lifters }}
-		<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
-			<div class="uk-card">
-				<h4 class="uk-card-title">{{ .Name }} - {{ .Hometown }}</h3>
-			</div>
-		</a>
-	{{ end }}
-</div>
-<hr>
-
-	{{ if (ne .TotalPages 1)}}
-	<div>
-		<ul class="uk-pagination uk-margin">
-		{{ range .Pages }}
-			{{ if (eq .Display $.Current)}}
-				<li class="uk-active">
-			{{ else }}
-				<li>
-			{{ end }}
+			<ul class="uk-pagination uk-margin">
+			{{ range .Pages }}
+				{{ if (eq .Display $.Current)}}
+					<li class="uk-active">
+				{{ else }}
+					<li>
+				{{ end }}
 				<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
-			</li>
+				</li>
+			{{ end }}
+			</ul>
 		{{ end }}
-		</ul>
-	</div>
+
+		<hr>
+
+		<div>
+			{{ range .Lifters }}
+				<a href="results?name={{ .Name }}&hometown={{ .Hometown }}">
+					<div class="uk-card">
+						<h4 class="uk-card-title">{{ .Name }} - {{ .Hometown }}</h3>
+					</div>
+				</a>
+			{{ end }}
+		</div>
+
+		<hr>
+
+		{{ if (ne .TotalPages 1)}}
+		<div>
+			<ul class="uk-pagination uk-margin">
+			{{ range .Pages }}
+				{{ if (eq .Display $.Current)}}
+					<li class="uk-active">
+				{{ else }}
+					<li>
+				{{ end }}
+					<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
+				</li>
+			{{ end }}
+			</ul>
+		</div>
+		{{ end }}
+
 	{{ end }}
-	{{ end }}
-</div>
-{{ end }}`
+</div>{{ end }}`
 
 var resultsTable = `{{ define "content" }}
 <div class="uk-margin" uk-margin>
