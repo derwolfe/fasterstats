@@ -130,8 +130,17 @@ var aboutPage = `{{ define "content"}}
 </div>
 <article class="uk-article">
 	<h1 class="uk-article">About</h1>
-	<p class="uk-article-text">I like Olympic Weightlifting statistics and if you're here, you probably do to.</p>
-	<p class="uk-article-text">There are numerous errors with this d</p>
+	<p class="uk-text-lead">I like Olympic Weightlifting statistics. If you're here, you probably do too.</p>
+	<p class="uk-article-text">
+  If you look at even a little bit of data from this site you'll find some
+  errors. Maybe a total doesn't add up or a lifter's best snatch is 40 kg
+  greater than their best ever clean & jerk. This is an artifact of the data
+  that powers this site having originated from USAW lifting data. To try to
+  make it easier to reconcile whether the USAW has incorrect data versus this
+  site, every result links back to the original data from the USAW site. This
+  link will show up in the <span style="font-weight: bold">MEET (USAW
+  LINK)</span> column of the results table.
+	</p>
 </article>
 {{ end }}`
 
