@@ -14,6 +14,7 @@ type API struct {
 	searchPage  *template.Template
 	namesPage   *template.Template
 	liftersPage *template.Template
+	aboutPage   *template.Template
 }
 
 // NewAPI returns an api that can be used to process http requests
@@ -21,12 +22,10 @@ func NewAPI(db *db.OurDB) *API {
 	// results
 	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
 	lifts.Parse(css)
-	lifts.Parse(navbar)
 	lifts.Parse(resultsTable)
 
 	// names
 	names := template.Must(template.New("liftingResults").Parse(liftingResults))
-	names.Parse(navbar)
 	names.Parse(css)
 	names.Parse(searchNamesResults)
 
@@ -35,7 +34,11 @@ func NewAPI(db *db.OurDB) *API {
 	search.Parse(css)
 	search.Parse(searchNamesResults)
 
-	return &API{db: db, searchPage: search, namesPage: names, liftersPage: lifts}
+	about := template.Must(template.New("about").Parse(liftingResults))
+	about.Parse(css)
+	about.Parse(aboutPage)
+
+	return &API{db: db, searchPage: search, namesPage: names, liftersPage: lifts, aboutPage: about}
 }
 
 // Search parses query parameters for name and returns a list of names
@@ -80,6 +83,15 @@ func (a API) SearchForm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a API) About(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		if err := a.aboutPage.Execute(w, nil); err != nil {
+			log.Printf("%v\n", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
 func (a API) Results(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		names, ok := r.URL.Query()["name"]
@@ -108,6 +120,31 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+var aboutPage = `{{ define "content"}}
+<div class="uk-margin" uk-margin>
+	<form class="uk-form" action="/search" method="GET" uk-form>
+		<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" value="{{ .Name }}" required minlength=3 autofocus>
+		<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
+	</form>
+</div>
+<article class="uk-article">
+	<h1 class="uk-article">About</h1>
+	<p class="uk-text-lead">I like Olympic Weightlifting statistics. If you're here, you probably do too.</p>
+	<p class="uk-article-text">
+  If you look at even a little bit of data from this site you'll find some
+  errors. Maybe a total doesn't add up or a lifter's best snatch is 40 kg
+  greater than their best ever clean & jerk. This is an artifact of the data
+  that powers this site having originated from USAW lifting data. To try to
+  make it easier to reconcile whether the USAW has incorrect data versus this
+  site, every result links back to the original data from the USAW site. This
+  link will show up in the <span style="font-weight: bold">MEET (USAW
+  LINK)</span> column of the results table.
+	</p>
+</article>
+{{ end }}`
+
+
 
 var css = `{{ define "css" }}
 <!-- UIkit CSS -->
@@ -248,17 +285,6 @@ var resultsTable = `{{ define "content" }}
 </div>
 {{ end }}`
 
-var navbar = `{{define "navbar" }}
-<nav class="uk-navbar-container uk-margin" uk-navbar>
-	<div class="nav-overlay uk-navbar-left">
-		<div class="uk-navbar-nav">
-			<div class="uk-margin-left">
- 	       </div>
-	</div>
-
-</nav>
-{{ end }}`
-
 var liftingResults = `<!doctype html>
 <html>
 	<head>
@@ -291,7 +317,7 @@ var landingPage = `<!doctype html>
 		<div class="uk-container">
 			<div class="uk-position-center">
 				<h2 class="">bitofapressout</h1>
-				<p class="">Search USA Weightlifting data</p>
+				<p class="">Search USA Weightlifting data from 2012 onward. See <a href="/about">about</a> to learn more!</p>
 				<div class="uk-margin" uk-margin>
 					<form class="uk-form" action="/search" method="GET" uk-form>
 						<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" required minlength=3 autofocus>
