@@ -137,20 +137,6 @@ var searchNamesResults = `{{ define "content" }}
 	{{ else }}
 		<p>Found {{ .Total }} matching lifters</li>
 
-		{{ if (ne .TotalPages 1)}}
-			<ul class="uk-pagination uk-margin">
-			{{ range .Pages }}
-				{{ if (eq .Display $.Current)}}
-					<li class="uk-active">
-				{{ else }}
-					<li>
-				{{ end }}
-				<a href="search?name={{ $.Name }}&page={{ .Display }}">{{ .Display }}</a>
-				</li>
-			{{ end }}
-			</ul>
-		{{ end }}
-
 		<hr>
 
 		<div>
