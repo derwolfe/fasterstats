@@ -308,7 +308,7 @@ var landingPage = `<!doctype html>
 		<div class="uk-container">
 			<div class="uk-position-center">
 				<h2 class="">bitofapressout</h1>
-				<p class="">Search USA Weightlifting data</p>
+				<p class="">Search USA Weightlifting data from 2012 onward. See <a href="/about">about</a> to learn more!</p>
 				<div class="uk-margin" uk-margin>
 					<form class="uk-form" action="/search" method="GET" uk-form>
 						<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" required minlength=3 autofocus>

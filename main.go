@@ -27,6 +27,7 @@ func main() {
 	http.HandleFunc("/", api.SearchForm)
 	http.HandleFunc("/search", api.Search)
 	http.HandleFunc("/results", api.Results)
+	http.HandleFunc("/about", api.About)
 
 	err = http.ListenAndServe(fmt.Sprintf(":%s", port), nil) // setting listening port
 
