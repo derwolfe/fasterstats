@@ -14,6 +14,7 @@ type API struct {
 	searchPage  *template.Template
 	namesPage   *template.Template
 	liftersPage *template.Template
+	aboutPage   *template.Template
 }
 
 // NewAPI returns an api that can be used to process http requests
@@ -35,7 +36,11 @@ func NewAPI(db *db.OurDB) *API {
 	search.Parse(css)
 	search.Parse(searchNamesResults)
 
-	return &API{db: db, searchPage: search, namesPage: names, liftersPage: lifts}
+	about := template.Must(template.New("about").Parse(liftingResults))
+	about.Parse(css)
+	about.Parse(aboutPage)
+
+	return &API{db: db, searchPage: search, namesPage: names, liftersPage: lifts, aboutPage: about}
 }
 
 // Search parses query parameters for name and returns a list of names
@@ -80,6 +85,15 @@ func (a API) SearchForm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a API) About(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		if err := a.aboutPage.Execute(w, nil); err != nil {
+			log.Printf("%v\n", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
 func (a API) Results(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		names, ok := r.URL.Query()["name"]
@@ -108,6 +122,22 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+var aboutPage = `{{ define "content"}}
+<div class="uk-margin" uk-margin>
+	<form class="uk-form" action="/search" method="GET" uk-form>
+		<input class="uk-input uk-form-width-large" name="name" type="search" placeholder="Find a lifter by name" value="{{ .Name }}" required minlength=3 autofocus>
+		<button class="uk-button uk-button-default" type="submit" value="Search">Search</button>
+	</form>
+</div>
+<article class="uk-article">
+	<h1 class="uk-article">About</h1>
+	<p class="uk-article-text">I like Olympic Weightlifting statistics and if you're here, you probably do to.</p>
+	<p class="uk-article-text">There are numerous errors with this d</p>
+</article>
+{{ end }}`
+
+
 
 var css = `{{ define "css" }}
 <!-- UIkit CSS -->
