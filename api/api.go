@@ -22,12 +22,10 @@ func NewAPI(db *db.OurDB) *API {
 	// results
 	lifts := template.Must(template.New("liftingResults").Parse(liftingResults))
 	lifts.Parse(css)
-	lifts.Parse(navbar)
 	lifts.Parse(resultsTable)
 
 	// names
 	names := template.Must(template.New("liftingResults").Parse(liftingResults))
-	names.Parse(navbar)
 	names.Parse(css)
 	names.Parse(searchNamesResults)
 
@@ -276,17 +274,6 @@ var resultsTable = `{{ define "content" }}
 		</table>
 	</div>
 </div>
-{{ end }}`
-
-var navbar = `{{define "navbar" }}
-<nav class="uk-navbar-container uk-margin" uk-navbar>
-	<div class="nav-overlay uk-navbar-left">
-		<div class="uk-navbar-nav">
-			<div class="uk-margin-left">
- 	       </div>
-	</div>
-
-</nav>
 {{ end }}`
 
 var liftingResults = `<!doctype html>
