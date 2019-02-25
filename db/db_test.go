@@ -94,3 +94,23 @@ func TestQueryWorksWhenZero(t *testing.T) {
 	assert.Equal(t, len(r.Lifters), 0, "no results should be returned")
 	assert.Equal(t, r.Total, int64(0), "the total was non-zero")
 }
+
+func TestIWFNames(t *testing.T) {
+	names := []struct {
+		in    string
+		first string
+		last  string
+	}{
+		{"Martha (Mattie) Rogers", "martha", "rogers"},
+		{"D'angelo Osorio", "dangelo", "osorio"}, // strip the apostrophe
+		{"chris", "chris", ""},                   // all names should have a last, but this is how it would run
+		{"", "", ""},                             // this should never be an input
+	}
+	for _, tt := range names {
+		t.Run(tt.in, func(t *testing.T) {
+			first, last := ToIWFName(tt.in)
+			assert.Equal(t, tt.first, first, "failed to convert first")
+			assert.Equal(t, tt.last, last, "failed to convert last")
+		})
+	}
+}

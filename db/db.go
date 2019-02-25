@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -110,6 +111,8 @@ func (r *Result) missesToMakes() {
 
 type ResultsSummary struct {
 	Lifter       string
+	IWFFirstName string
+	IWFLastName  string
 	Hometown     string
 	BestCJ       decimal.Decimal
 	BestSN       decimal.Decimal
@@ -302,6 +305,8 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 
 	// we shouldn't get here if there are no results
 	rs.Lifter = results[0].Lifter
+	rs.IWFFirstName, rs.IWFLastName = ToIWFName(results[0].Lifter)
+
 	rs.Hometown = results[0].Hometown
 	rs.RecentWeight = results[0].CompetitionWeight
 
@@ -332,4 +337,20 @@ func makePageInfoRange(min, max int) []PageInfo {
 		}
 	}
 	return a
+}
+
+var nameReg = regexp.MustCompile("[^a-z ]+")
+
+// ToIWFName returns the name needed to perform a search against the IWF
+func ToIWFName(name string) (string, string) {
+	lowered := strings.ToLower(name)
+	lowered = nameReg.ReplaceAllString(lowered, "")
+
+	ss := strings.Split(lowered, " ")
+	last := ss[len(ss)-1]
+
+	if len(ss) > 1 {
+		return ss[0], last
+	}
+	return lowered, ""
 }

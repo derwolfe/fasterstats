@@ -144,8 +144,6 @@ var aboutPage = `{{ define "content"}}
 </article>
 {{ end }}`
 
-
-
 var css = `{{ define "css" }}
 <!-- UIkit CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/css/uikit.min.css" />
@@ -235,6 +233,7 @@ var resultsTable = `{{ define "content" }}
 		</div>
 	</div>
 	<h3>Competitions</h3>
+	<p><a rel="noopener noreferrer" target="_blank" href="https://www.iwf.net/new_bw/results_by_events/?athlete_name={{ .IWFLastName }}+{{ .IWFFirstName }}&athlete_gender=all&athlete_nation=USA">IWF results</a></p>
 	<p class="uk-text-muted">*Bests are bolded</p>
 	<div class="uk-overflow-auto">
 		<table class="uk-table uk-table-divider uk-table-hover">
