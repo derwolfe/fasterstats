@@ -144,8 +144,6 @@ var aboutPage = `{{ define "content"}}
 </article>
 {{ end }}`
 
-
-
 var css = `{{ define "css" }}
 <!-- UIkit CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.3/css/uikit.min.css" />
@@ -231,6 +229,7 @@ var resultsTable = `{{ define "content" }}
 				<li>Most recent weight: {{ .RecentWeight }} kg</li>
 				<li>Avg # Snatches made: {{ .AvgSNMakes }}%</li>
 				<li>Avg # Clean & Jerks made: {{ .AvgCJMakes }}%</li>
+				<li><a rel="noopener noreferrer" target="_blank" href="https://www.iwf.net/new_bw/results_by_events/?athlete_name={{ .IWFName }}&athlete_gender=all&athlete_nation=USA">IWF search</a></li>
 			</ul>
 		</div>
 	</div>

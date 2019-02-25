@@ -110,6 +110,7 @@ func (r *Result) missesToMakes() {
 
 type ResultsSummary struct {
 	Lifter       string
+	IWFName      string
 	Hometown     string
 	BestCJ       decimal.Decimal
 	BestSN       decimal.Decimal
@@ -302,6 +303,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 
 	// we shouldn't get here if there are no results
 	rs.Lifter = results[0].Lifter
+	rs.IWFName = ToIWFName(results[0].Lifter)
 	rs.Hometown = results[0].Hometown
 	rs.RecentWeight = results[0].CompetitionWeight
 
@@ -332,4 +334,11 @@ func makePageInfoRange(min, max int) []PageInfo {
 		}
 	}
 	return a
+}
+
+// ToIWFName returns the name needed to perform a search against the IWF
+func ToIWFName(name string) string {
+	ss := strings.Split(name, " ")
+	last := ss[len(ss)-1]
+	return strings.ToLower(last)
 }
