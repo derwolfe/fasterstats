@@ -229,11 +229,11 @@ var resultsTable = `{{ define "content" }}
 				<li>Most recent weight: {{ .RecentWeight }} kg</li>
 				<li>Avg # Snatches made: {{ .AvgSNMakes }}%</li>
 				<li>Avg # Clean & Jerks made: {{ .AvgCJMakes }}%</li>
-				<li><a rel="noopener noreferrer" target="_blank" href="https://www.iwf.net/new_bw/results_by_events/?athlete_name={{ .IWFName }}&athlete_gender=all&athlete_nation=USA">IWF search</a></li>
 			</ul>
 		</div>
 	</div>
 	<h3>Competitions</h3>
+	<p><a rel="noopener noreferrer" target="_blank" href="https://www.iwf.net/new_bw/results_by_events/?athlete_name={{ .IWFName }}&athlete_gender=all&athlete_nation=USA">IWF results</a></p>
 	<p class="uk-text-muted">*Bests are bolded</p>
 	<div class="uk-overflow-auto">
 		<table class="uk-table uk-table-divider uk-table-hover">
