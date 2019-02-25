@@ -215,14 +215,19 @@ var resultsTable = `{{ define "content" }}
 
 <article class="uk-article">
 	<h1 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h1>
+	<h3>Links</h3>
+	<ul class="uk-list">
+		<li><a rel="noopener noreferrer" target="_blank" href="https://www.iwf.net/new_bw/results_by_events/?athlete_name={{ .IWFLastName }}+{{ .IWFFirstName }}&athlete_gender=all&athlete_nation=USA">Search for IWF results</a></li>
+	</ul>
 	<h3>Statistics</h3>
+	<p class="uk-text-muted">Computed from USAW competition results</p>
 	<div class="uk-grid-divider uk-child-width-expand@s" uk-grid>
 		<div>
 			<ul class="uk-list">
 				<li>Best CJ: {{ .BestCJ }} kg</li>
 				<li>Best Snatch: {{ .BestSN }} kg </li>
 				<li>Best Total: {{ .BestTotal }} kg</li>
-			<ul>
+				<ul>
 		</div>
 		<div>
 			<ul class="uk-list">
@@ -232,8 +237,7 @@ var resultsTable = `{{ define "content" }}
 			</ul>
 		</div>
 	</div>
-	<h3>Competitions</h3>
-	<p><a rel="noopener noreferrer" target="_blank" href="https://www.iwf.net/new_bw/results_by_events/?athlete_name={{ .IWFLastName }}+{{ .IWFFirstName }}&athlete_gender=all&athlete_nation=USA">IWF results</a></p>
+	<h3>USAW Competitions</h3>
 	<p class="uk-text-muted">*Bests are bolded</p>
 	<div class="uk-overflow-auto">
 		<table class="uk-table uk-table-divider uk-table-hover">
