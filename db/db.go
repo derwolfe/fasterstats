@@ -149,7 +149,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 
 	// get the number of results so we can compute pages. Max result number is 100 per page.
 	var total int64
-	err := o.db.QueryRow(`SELECT IFNULL(SUM(ct), 0) from (SELECT 1 as ct FROM results WHERE lifter like $1 GROUP BY hometown, lifter)`, nameLike).Scan(&total)
+	err := o.nameCtQuery.QueryRow(nameLike).Scan(&total)
 	if err != nil {
 		fmt.Printf("cw: %v", err)
 		return nil, err
@@ -187,7 +187,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	}
 
 	// get the names
-	rows, err := o.db.Query(`SELECT DISTINCT lifter, hometown FROM results WHERE lifter like $1 ORDER BY lifter ASC LIMIT $2 OFFSET $3`, nameLike, pageLimit, onum*pageLimit)
+	rows, err := o.nameQuery.Query(nameLike, pageLimit, onum*pageLimit)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 
 func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	log.Printf("name: %v, hometown: %v\n", name, hometown)
-	rows, err := o.db.Query(`SELECT date, meet_name, lifter, weight_class, competition_weight, hometown, cj1, cj2, cj3, sn1, sn2, sn3, total, best_snatch, best_cleanjerk, url FROM results WHERE lifter = $1 and hometown = $2 ORDER BY date DESC`, name, hometown)
+	rows, err := o.resultsQuery.Query(name, hometown)
 	if err != nil {
 		return nil, err
 	}
@@ -259,17 +259,17 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	rs := ResultsSummary{Results: results}
 
 	// load the total
-	err = o.db.QueryRow(`select MAX(total) from results where lifter = $1 and hometown = $2`, name, hometown).Scan(&rs.BestTotal)
+	err = o.bestTotalQuery.QueryRow(name, hometown).Scan(&rs.BestTotal)
 	if err != nil {
 		return nil, err
 	}
 	// load the best SN
-	err = o.db.QueryRow(`select max(best_snatch) from results where lifter = $1 and hometown = $2`, name, hometown).Scan(&rs.BestTotal)
+	err = o.bestSNQuery.QueryRow(name, hometown).Scan(&rs.BestSN)
 	if err != nil {
 		return nil, err
 	}
 	// load the best CJ
-	err = o.db.QueryRow(`select max(best_cleanjerk) from results where lifter = $1 and hometown = $2`, name, hometown).Scan(&rs.BestTotal)
+	err = o.bestCJQuery.QueryRow(name, hometown).Scan(&rs.BestCJ)
 	if err != nil {
 		return nil, err
 	}
