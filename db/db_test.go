@@ -2,6 +2,8 @@ package db
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -112,5 +114,36 @@ func TestIWFNames(t *testing.T) {
 			assert.Equal(t, tt.first, first, "failed to convert first")
 			assert.Equal(t, tt.last, last, "failed to convert last")
 		})
+	}
+}
+
+var lifterResponseResult *LiftersResponse
+
+func BenchmarkNameQuery(b *testing.B) {
+	log.SetOutput(ioutil.Discard)
+	db, err := BuildDB("../results.db")
+	defer db.Close()
+	if err != nil {
+		panic("failed to setup DB")
+	}
+
+	for i := 0; i < b.N; i++ {
+		r, _ := db.QueryNames("mattie rogers", "1")
+		lifterResponseResult = r
+	}
+}
+
+var resultsResponse *ResultsSummary
+func BenchmarkResultsQuery(b *testing.B) {
+	log.SetOutput(ioutil.Discard)
+	db, err := BuildDB("../results.db")
+	defer db.Close()
+	if err != nil {
+		panic("failed to setup DB")
+	}
+
+	for i := 0; i < b.N; i++ {
+		r, _ := db.QueryResults("D'Angelo Osorio", "Vallejo, CA")
+		resultsResponse = r
 	}
 }
