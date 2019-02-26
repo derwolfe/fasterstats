@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"gitlab.com/derwolfe/faststats/api"
 	"gitlab.com/derwolfe/faststats/db"
 )

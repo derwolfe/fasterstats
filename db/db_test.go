@@ -2,9 +2,9 @@ package db
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -134,6 +134,7 @@ func BenchmarkNameQuery(b *testing.B) {
 }
 
 var resultsResponse *ResultsSummary
+
 func BenchmarkResultsQuery(b *testing.B) {
 	log.SetOutput(ioutil.Discard)
 	db, err := BuildDB("../results.db")

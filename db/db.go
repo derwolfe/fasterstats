@@ -39,19 +39,16 @@ func BuildDB(dbPath string) (*OurDB, error) {
 	}
 
 	bestCJ, err := db.Prepare(`select max(best_cleanjerk) from results where lifter = $1 and hometown = $2`)
-
 	if err != nil {
 		return nil, err
 	}
 
 	bestSN, err := db.Prepare(`select max(best_snatch) from results where lifter = $1 and hometown = $2`)
-
 	if err != nil {
 		return nil, err
 	}
 
 	bestTotal, err := db.Prepare(`select MAX(total) from results where lifter = $1 and hometown = $2`)
-
 	if err != nil {
 		return nil, err
 	}
