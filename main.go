@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
+	"gitlab.com/derwolfe/faststats/api"
+	"gitlab.com/derwolfe/faststats/db"
 	"log"
 	"net/http"
 	"os"
-
-	"gitlab.com/derwolfe/faststats/api"
-	"gitlab.com/derwolfe/faststats/db"
 )
 
 func main() {
