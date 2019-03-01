@@ -14,9 +14,8 @@ import (
 )
 
 type OurDB struct {
-	db          *sql.DB
-	nameCtQuery *sql.Stmt
-	// nameCtPageQuery *sql.Stmt
+	db             *sql.DB
+	nameCtQuery    *sql.Stmt
 	nameQuery      *sql.Stmt
 	resultsQuery   *sql.Stmt
 	resultsCtQuery *sql.Stmt
