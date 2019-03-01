@@ -12,12 +12,23 @@ import (
 	"strings"
 )
 
+type OurDB struct {
+	db          *sql.DB
+	nameCtQuery *sql.Stmt
+	// nameCtPageQuery *sql.Stmt
+	nameQuery      *sql.Stmt
+	resultsQuery   *sql.Stmt
+	resultsCtQuery *sql.Stmt
+	bestCJQuery    *sql.Stmt
+	bestSNQuery    *sql.Stmt
+	bestTotalQuery *sql.Stmt
+}
+
 func BuildDB(dbPath string) (*OurDB, error) {
 	// mark the connection as read only!
 
 	// make sure this has been run!
 	// create index idx_lifter_hometown on results(lifter, hometown);
-
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal(err)
@@ -121,16 +132,6 @@ type ResultsSummary struct {
 	AvgSNMakes   decimal.Decimal
 	RecentWeight decimal.Decimal
 	Results      []*Result
-}
-
-type OurDB struct {
-	db             *sql.DB
-	nameCtQuery    *sql.Stmt
-	nameQuery      *sql.Stmt
-	resultsQuery   *sql.Stmt
-	bestCJQuery    *sql.Stmt
-	bestSNQuery    *sql.Stmt
-	bestTotalQuery *sql.Stmt
 }
 
 type PageInfo struct {
