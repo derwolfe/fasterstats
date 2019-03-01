@@ -49,20 +49,22 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		return nil, err
 	}
 
-	bestCJ, err := db.Prepare(`select max(best_cleanjerk) from results where lifter = $1 and hometown = $2`)
+	resultsCtStmt, err := db.Prepare(`SELECT IFNULL(SUM(ct), 0) from (SELECT 1 as ct FROM results WHERE lifter = $1 and hometown = $2)`)
+	if err != nil {
+		return nil, err
+	}
 
+	bestCJ, err := db.Prepare(`select max(best_cleanjerk) from results where lifter = $1 and hometown = $2`)
 	if err != nil {
 		return nil, err
 	}
 
 	bestSN, err := db.Prepare(`select max(best_snatch) from results where lifter = $1 and hometown = $2`)
-
 	if err != nil {
 		return nil, err
 	}
 
 	bestTotal, err := db.Prepare(`select MAX(total) from results where lifter = $1 and hometown = $2`)
-
 	if err != nil {
 		return nil, err
 	}
@@ -71,6 +73,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		db:             db,
 		nameCtQuery:    nameCtStmt,
 		nameQuery:      nameStmt,
+		resultsCtQuery: resultsCtStmt,
 		resultsQuery:   resultsStmt,
 		bestCJQuery:    bestCJ,
 		bestSNQuery:    bestSN,
@@ -82,6 +85,7 @@ func (o *OurDB) Close() {
 	o.nameQuery.Close()
 	o.nameCtQuery.Close()
 	o.resultsQuery.Close()
+	o.resultsCtQuery.Close()
 	o.bestCJQuery.Close()
 	o.bestSNQuery.Close()
 	o.bestTotalQuery.Close()
