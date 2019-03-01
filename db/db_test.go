@@ -163,6 +163,7 @@ func BenchmarkResultsQuery(b *testing.B) {
 
 func TestNoBadData(t *testing.T) {
 	db, err := BuildDB("../results.db")
+	log.SetOutput(ioutil.Discard)
 	defer db.Close()
 	if err != nil {
 		panic("failed to get total")
