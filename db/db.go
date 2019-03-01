@@ -7,17 +7,28 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"log"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
 )
+
+type OurDB struct {
+	db             *sql.DB
+	nameCtQuery    *sql.Stmt
+	nameQuery      *sql.Stmt
+	resultsQuery   *sql.Stmt
+	resultsCtQuery *sql.Stmt
+	bestCJQuery    *sql.Stmt
+	bestSNQuery    *sql.Stmt
+	bestTotalQuery *sql.Stmt
+}
 
 func BuildDB(dbPath string) (*OurDB, error) {
 	// mark the connection as read only!
 
 	// make sure this has been run!
 	// create index idx_lifter_hometown on results(lifter, hometown);
-
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal(err)
@@ -38,20 +49,22 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		return nil, err
 	}
 
-	bestCJ, err := db.Prepare(`select max(best_cleanjerk) from results where lifter = $1 and hometown = $2`)
+	resultsCtStmt, err := db.Prepare(`SELECT IFNULL(SUM(ct), 0) from (SELECT 1 as ct FROM results WHERE lifter = $1 and hometown = $2)`)
+	if err != nil {
+		return nil, err
+	}
 
+	bestCJ, err := db.Prepare(`select max(best_cleanjerk) from results where lifter = $1 and hometown = $2`)
 	if err != nil {
 		return nil, err
 	}
 
 	bestSN, err := db.Prepare(`select max(best_snatch) from results where lifter = $1 and hometown = $2`)
-
 	if err != nil {
 		return nil, err
 	}
 
 	bestTotal, err := db.Prepare(`select MAX(total) from results where lifter = $1 and hometown = $2`)
-
 	if err != nil {
 		return nil, err
 	}
@@ -60,6 +73,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 		db:             db,
 		nameCtQuery:    nameCtStmt,
 		nameQuery:      nameStmt,
+		resultsCtQuery: resultsCtStmt,
 		resultsQuery:   resultsStmt,
 		bestCJQuery:    bestCJ,
 		bestSNQuery:    bestSN,
@@ -71,6 +85,7 @@ func (o *OurDB) Close() {
 	o.nameQuery.Close()
 	o.nameCtQuery.Close()
 	o.resultsQuery.Close()
+	o.resultsCtQuery.Close()
 	o.bestCJQuery.Close()
 	o.bestSNQuery.Close()
 	o.bestTotalQuery.Close()
@@ -123,16 +138,6 @@ type ResultsSummary struct {
 	Results      []*Result
 }
 
-type OurDB struct {
-	db             *sql.DB
-	nameCtQuery    *sql.Stmt
-	nameQuery      *sql.Stmt
-	resultsQuery   *sql.Stmt
-	bestCJQuery    *sql.Stmt
-	bestSNQuery    *sql.Stmt
-	bestTotalQuery *sql.Stmt
-}
-
 type PageInfo struct {
 	Display int
 }
@@ -150,7 +155,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	log.Printf("name: %v, offset: %v\n", name, offset)
 	nameLike := "%" + strings.Replace(name, " ", "%", -1) + "%"
 
-	// get the number of results so we can compute pages. Max result number is 100 per page.
+	// get the number of results so we can compute pages. Max result number is 50 per page.
 	var total int64
 	err := o.nameCtQuery.QueryRow(nameLike).Scan(&total)
 	if err != nil {
@@ -184,11 +189,31 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	} else {
 		onum = int64(1)
 	}
+	// onum is user supplied so we need to ensure that don't overallocate
+
+	// quotient, remainder := numerator/denominator, numerator%denominator
+
+	// total possible for this page
+	// 200, page 2, 2 < 4, => 50
+	// 198, page 4, 4 * 50 = 200, 200 - 198 = 2, 198 % 50 = 48
+	// 48, page 1, 1 * 50 = 50, 48 % 50 = 48
+	var totalThisPage int64
+	numPages1 := int64(math.Ceil(float64(total) / float64(pageLimit)))
+	if onum < numPages1 {
+		totalThisPage = pageLimit
+	} else {
+		totalThisPage = total % pageLimit
+	}
+
+	//	fmt.Printf("total: %v, tfp: %v, onum: %v, np: %v\n", total, totalThisPage, onum, numPages1)
+	if totalThisPage > pageLimit {
+		panic("page size exceeded limits")
+	}
+
 	// page is meant to be min 1 for humans, offset is internal and should be 0-based
 	if onum >= 1 {
 		onum--
 	}
-
 	// get the names
 	rows, err := o.nameQuery.Query(nameLike, pageLimit, onum*pageLimit)
 	if err != nil {
@@ -196,14 +221,16 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	}
 	defer rows.Close()
 
-	var lifters []Lifter
+	lifters := make([]Lifter, totalThisPage, totalThisPage)
+	ct := 0
 	for rows.Next() {
 		l := Lifter{}
 		err = rows.Scan(&l.Name, &l.Hometown)
 		if err != nil {
 			return nil, err
 		}
-		lifters = append(lifters, l)
+		lifters[ct] = l
+		ct++
 	}
 	err = rows.Err()
 	if err != nil {
@@ -230,6 +257,13 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 
 func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	log.Printf("name: %v, hometown: %v\n", name, hometown)
+	// check results count
+	var resultCt int64
+	err := o.resultsCtQuery.QueryRow(name, hometown).Scan(&resultCt)
+	if err != nil {
+		return nil, err
+	}
+
 	rows, err := o.resultsQuery.Query(name, hometown)
 	if err != nil {
 		return nil, err
@@ -237,7 +271,9 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	defer rows.Close()
 
 	// load the results
-	var results []*Result
+	results := make([]*Result, resultCt, resultCt)
+
+	ct := 0
 	for rows.Next() {
 		r := &Result{}
 		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.Weightclass, &r.CompetitionWeight, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.BestSN, &r.BestCJ, &r.URL)
@@ -248,7 +284,8 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		// compute misses an makes
 		r.BestResult = false
 		r.missesToMakes()
-		results = append(results, r)
+		results[ct] = r
+		ct++
 	}
 	err = rows.Err()
 	if err != nil {
