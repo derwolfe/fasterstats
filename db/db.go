@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"log"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -189,11 +190,31 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	} else {
 		onum = int64(1)
 	}
+	// onum is user supplied so we need to ensure that don't overallocate
+
+	// quotient, remainder := numerator/denominator, numerator%denominator
+
+	// total possible for this page
+	// 200, page 2, 2 < 4, => 50
+	// 198, page 4, 4 * 50 = 200, 200 - 198 = 2, 198 % 50 = 48
+	// 48, page 1, 1 * 50 = 50, 48 % 50 = 48
+	var totalThisPage int64
+	numPages1 := int64(math.Ceil(float64(total) / float64(pageLimit)))
+	if onum < numPages1 {
+		totalThisPage = pageLimit
+	} else {
+		totalThisPage = total % pageLimit
+	}
+
+	//	fmt.Printf("total: %v, tfp: %v, onum: %v, np: %v\n", total, totalThisPage, onum, numPages1)
+	if totalThisPage > pageLimit {
+		panic("page size exceeded limits")
+	}
+
 	// page is meant to be min 1 for humans, offset is internal and should be 0-based
 	if onum >= 1 {
 		onum--
 	}
-
 	// get the names
 	rows, err := o.nameQuery.Query(nameLike, pageLimit, onum*pageLimit)
 	if err != nil {
@@ -201,14 +222,16 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	}
 	defer rows.Close()
 
-	var lifters []Lifter
+	lifters := make([]Lifter, totalThisPage, totalThisPage)
+	ct := 0
 	for rows.Next() {
 		l := Lifter{}
 		err = rows.Scan(&l.Name, &l.Hometown)
 		if err != nil {
 			return nil, err
 		}
-		lifters = append(lifters, l)
+		lifters[ct] = l
+		ct++
 	}
 	err = rows.Err()
 	if err != nil {
