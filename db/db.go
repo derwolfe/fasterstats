@@ -258,6 +258,13 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 
 func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	log.Printf("name: %v, hometown: %v\n", name, hometown)
+	// check results count
+	var resultCt int64
+	err := o.resultsCtQuery.QueryRow(name, hometown).Scan(&resultCt)
+	if err != nil {
+		return nil, err
+	}
+
 	rows, err := o.resultsQuery.Query(name, hometown)
 	if err != nil {
 		return nil, err
@@ -265,7 +272,9 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	defer rows.Close()
 
 	// load the results
-	var results []*Result
+	results := make([]*Result, resultCt, resultCt)
+
+	ct := 0
 	for rows.Next() {
 		r := &Result{}
 		err = rows.Scan(&r.Date, &r.MeetName, &r.Lifter, &r.Weightclass, &r.CompetitionWeight, &r.Hometown, &r.CJ1, &r.CJ2, &r.CJ3, &r.SN1, &r.SN2, &r.SN3, &r.Total, &r.BestSN, &r.BestCJ, &r.URL)
@@ -276,7 +285,8 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 		// compute misses an makes
 		r.BestResult = false
 		r.missesToMakes()
-		results = append(results, r)
+		results[ct] = r
+		ct++
 	}
 	err = rows.Err()
 	if err != nil {
