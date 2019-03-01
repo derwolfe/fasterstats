@@ -156,7 +156,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	log.Printf("name: %v, offset: %v\n", name, offset)
 	nameLike := "%" + strings.Replace(name, " ", "%", -1) + "%"
 
-	// get the number of results so we can compute pages. Max result number is 100 per page.
+	// get the number of results so we can compute pages. Max result number is 50 per page.
 	var total int64
 	err := o.nameCtQuery.QueryRow(nameLike).Scan(&total)
 	if err != nil {
