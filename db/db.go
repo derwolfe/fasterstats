@@ -14,13 +14,7 @@ import (
 )
 
 type OurDB struct {
-	db             *sql.DB
-	// nameQuery      *sql.Stmt
-	// resultsQuery   *sql.Stmt
-	// resultsCtQuery *sql.Stmt
-	// bestCJQuery    *sql.Stmt
-	// bestSNQuery    *sql.Stmt
-	// bestTotalQuery *sql.Stmt
+	db *sql.DB
 }
 
 func BuildDB(dbPath string) (*OurDB, error) {
@@ -34,7 +28,7 @@ func BuildDB(dbPath string) (*OurDB, error) {
 	}
 
 	return &OurDB{
-		db:             db,
+		db: db,
 	}, nil
 }
 
