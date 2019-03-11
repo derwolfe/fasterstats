@@ -220,7 +220,7 @@ var resultsTable = `{{ define "content" }}
 		<li><a rel="noopener noreferrer" target="_blank" href="https://www.iwf.net/new_bw/results_by_events/?athlete_name={{ .IWFLastName }}+{{ .IWFFirstName }}&athlete_gender=all&athlete_nation=USA">Search for IWF results</a></li>
 	</ul>
 	<h3>Statistics</h3>
-	<p class="uk-text-muted">Computed from USAW competition results</p>
+	<p class="uk-text-muted">Computed from USAW competition results. See <a href="/about">about</a> to learn about data problems.</p>
 	<div class="uk-grid-divider uk-child-width-expand@s" uk-grid>
 		<div>
 			<ul class="uk-list">
