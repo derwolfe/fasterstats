@@ -180,7 +180,10 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	return resp, nil
 }
 
-func getPageSize(onum, total, pageLimit int64) int64 {
+func getPageSize(pageNum, total, pageLimit int64) int64 {
+	if pageNum < 1 {
+		panic("offset must be positive")
+	}
 	// onum is user supplied so we need to ensure that don't overallocate
 	// quotient, remainder := numerator/denominator, numerator%denominator
 
@@ -188,24 +191,15 @@ func getPageSize(onum, total, pageLimit int64) int64 {
 	// 200, page 2, 2 < 4, => 50
 	// 198, page 4, 4 * 50 = 200, 200 - 198 = 2, 198 % 50 = 48
 	// 48, page 1, 1 * 50 = 50, 48 % 50 = 48
-	var totalThisPage int64
 	numPages := int64(math.Ceil(float64(total) / float64(pageLimit)))
-	// we need to handle the case where we have fifty
-
-	// if total is 0, let's return
-	if total == 0 {
-		return 0
+	if pageNum < numPages {
+		return pageLimit
 	}
-
-	if offset < numPages {
-		totalThisPage = pageLimit
-	} else {
-		totalThisPage = total % pageLimit
+	rem := total % pageLimit
+	if total > 0 && rem == 0 {
+		return pageLimit
 	}
-	if totalThisPage > pageLimit {
-		panic("page size exceeded limits")
-	}
-	return totalThisPage
+	return rem
 }
 
 func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
