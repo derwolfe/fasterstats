@@ -184,13 +184,6 @@ func getPageSize(pageNum, total, limit int64) int64 {
 	if pageNum < 1 {
 		panic("offset must be positive")
 	}
-	// onum is user supplied so we need to ensure that don't overallocate
-	// quotient, remainder := numerator/denominator, numerator%denominator
-
-	// total possible for this page
-	// 200, page 2, 2 < 4, => 50
-	// 198, page 4, 4 * 50 = 200, 200 - 198 = 2, 198 % 50 = 48
-	// 48, page 1, 1 * 50 = 50, 48 % 50 = 48
 	numPages := int64(math.Ceil(float64(total) / float64(limit)))
 	if pageNum < numPages {
 		return limit

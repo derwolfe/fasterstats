@@ -167,6 +167,7 @@ func TestGetPageSize(t *testing.T) {
 		offset, total, limit, expected int64
 		name string
 	}{
+		{1, 0, 50, 0, "no results",},
 		{1, 1, 50, 1, "first partial page", },
 		{1, 50, 50, 50, "first full page", },
 		{2, 100, 50, 50, "second page full", },
