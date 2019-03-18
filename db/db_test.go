@@ -161,6 +161,26 @@ func BenchmarkResultsQuery(b *testing.B) {
 	}
 }
 
+// test getting lifter names and pagination
+func TestGetPageSize(t *testing.T) {
+	cases := []struct {
+		offset, total, limit, expected int64
+		name                           string
+	}{
+		{1, 0, 50, 0, "no results"},
+		{1, 1, 50, 1, "first partial page"},
+		{1, 50, 50, 50, "first full page"},
+		{2, 100, 50, 50, "second page full"},
+		{2, 51, 50, 1, "last partial page"},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := getPageSize(tt.offset, tt.total, tt.limit)
+			assert.Equal(t, tt.expected, actual, "actual didn't match expected")
+		})
+	}
+}
+
 func TestNoBadData(t *testing.T) {
 	db, err := BuildDB("../results.db")
 	log.SetOutput(ioutil.Discard)

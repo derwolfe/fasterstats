@@ -133,26 +133,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	} else {
 		onum = int64(1)
 	}
-	// onum is user supplied so we need to ensure that don't overallocate
-
-	// quotient, remainder := numerator/denominator, numerator%denominator
-
-	// total possible for this page
-	// 200, page 2, 2 < 4, => 50
-	// 198, page 4, 4 * 50 = 200, 200 - 198 = 2, 198 % 50 = 48
-	// 48, page 1, 1 * 50 = 50, 48 % 50 = 48
-	var totalThisPage int64
-	numPages1 := int64(math.Ceil(float64(total) / float64(pageLimit)))
-	if onum < numPages1 {
-		totalThisPage = pageLimit
-	} else {
-		totalThisPage = total % pageLimit
-	}
-
-	//	fmt.Printf("total: %v, tfp: %v, onum: %v, np: %v\n", total, totalThisPage, onum, numPages1)
-	if totalThisPage > pageLimit {
-		panic("page size exceeded limits")
-	}
+	totalThisPage := getPageSize(onum, total, pageLimit)
 
 	// page is meant to be min 1 for humans, offset is internal and should be 0-based
 	if onum >= 1 {
@@ -184,7 +165,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 
 	// there are 50 per page
 	numPages := total / pageLimit
-	pages := makePageInfoRange(0, int(numPages))
+	pages := makePageInfoRange(int(numPages))
 
 	// total is the number of pages
 	// current is the page being returned, if this had an offset, it would be the next page
@@ -197,6 +178,21 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 		TotalPages: int64(len(pages)),
 	}
 	return resp, nil
+}
+
+func getPageSize(pageNum, total, limit int64) int64 {
+	if pageNum < 1 {
+		panic("offset must be positive")
+	}
+	numPages := int64(math.Ceil(float64(total) / float64(limit)))
+	if pageNum < numPages {
+		return limit
+	}
+	rem := total % limit
+	if total > 0 && rem == 0 {
+		return limit
+	}
+	return rem
 }
 
 func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
@@ -308,13 +304,12 @@ func maxDec(x, y decimal.Decimal) decimal.Decimal {
 	return y
 }
 
-func makePageInfoRange(min, max int) []PageInfo {
-	// make a range of numbers, then build the page info from it
-	a := make([]PageInfo, max-min+1)
+func makePageInfoRange(max int) []PageInfo {
+	// pagination always starts at 1
+	a := make([]PageInfo, max+1)
 	for i := range a {
-		v := min + i
 		a[i] = PageInfo{
-			Display: v + 1,
+			Display: i + 1,
 		}
 	}
 	return a
