@@ -189,13 +189,19 @@ func getPageSize(onum, total, pageLimit int64) int64 {
 	// 198, page 4, 4 * 50 = 200, 200 - 198 = 2, 198 % 50 = 48
 	// 48, page 1, 1 * 50 = 50, 48 % 50 = 48
 	var totalThisPage int64
-	numPages1 := int64(math.Ceil(float64(total) / float64(pageLimit)))
-	if onum < numPages1 {
+	numPages := int64(math.Ceil(float64(total) / float64(pageLimit)))
+	// we need to handle the case where we have fifty
+
+	// if total is 0, let's return
+	if total == 0 {
+		return 0
+	}
+
+	if offset < numPages {
 		totalThisPage = pageLimit
 	} else {
 		totalThisPage = total % pageLimit
 	}
-	//	fmt.Printf("total: %v, tfp: %v, onum: %v, np: %v\n", total, totalThisPage, onum, numPages1)
 	if totalThisPage > pageLimit {
 		panic("page size exceeded limits")
 	}
