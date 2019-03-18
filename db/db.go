@@ -165,7 +165,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 
 	// there are 50 per page
 	numPages := total / pageLimit
-	pages := makePageInfoRange(0, int(numPages))
+	pages := makePageInfoRange(int(numPages))
 
 	// total is the number of pages
 	// current is the page being returned, if this had an offset, it would be the next page
@@ -304,13 +304,12 @@ func maxDec(x, y decimal.Decimal) decimal.Decimal {
 	return y
 }
 
-func makePageInfoRange(min, max int) []PageInfo {
-	// make a range of numbers, then build the page info from it
-	a := make([]PageInfo, max-min+1)
+func makePageInfoRange(max int) []PageInfo {
+	// pagination always starts at 1
+	a := make([]PageInfo, max+1)
 	for i := range a {
-		v := min + i
 		a[i] = PageInfo{
-			Display: v + 1,
+			Display: i + 1,
 		}
 	}
 	return a
