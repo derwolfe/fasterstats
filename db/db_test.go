@@ -163,15 +163,15 @@ func BenchmarkResultsQuery(b *testing.B) {
 
 // test getting lifter names and pagination
 func TestGetPageSize(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		offset, total, limit, expected int64
-		name string
+		name                           string
 	}{
-		{1, 0, 50, 0, "no results",},
-		{1, 1, 50, 1, "first partial page", },
-		{1, 50, 50, 50, "first full page", },
-		{2, 100, 50, 50, "second page full", },
-		{2, 51, 50, 1, "last partial page" },
+		{1, 0, 50, 0, "no results"},
+		{1, 1, 50, 1, "first partial page"},
+		{1, 50, 50, 50, "first full page"},
+		{2, 100, 50, 50, "second page full"},
+		{2, 51, 50, 1, "last partial page"},
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
