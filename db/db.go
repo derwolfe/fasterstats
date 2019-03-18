@@ -180,7 +180,7 @@ func (o *OurDB) QueryNames(name, offset string) (*LiftersResponse, error) {
 	return resp, nil
 }
 
-func getPageSize(pageNum, total, pageLimit int64) int64 {
+func getPageSize(pageNum, total, limit int64) int64 {
 	if pageNum < 1 {
 		panic("offset must be positive")
 	}
@@ -191,13 +191,13 @@ func getPageSize(pageNum, total, pageLimit int64) int64 {
 	// 200, page 2, 2 < 4, => 50
 	// 198, page 4, 4 * 50 = 200, 200 - 198 = 2, 198 % 50 = 48
 	// 48, page 1, 1 * 50 = 50, 48 % 50 = 48
-	numPages := int64(math.Ceil(float64(total) / float64(pageLimit)))
+	numPages := int64(math.Ceil(float64(total) / float64(limit)))
 	if pageNum < numPages {
-		return pageLimit
+		return limit
 	}
-	rem := total % pageLimit
+	rem := total % limit
 	if total > 0 && rem == 0 {
-		return pageLimit
+		return limit
 	}
 	return rem
 }
