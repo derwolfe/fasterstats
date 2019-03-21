@@ -109,6 +109,7 @@ func (a API) Results(w http.ResponseWriter, r *http.Request) {
 		// this will produce errors! what if the lifter has no results and someone modifies the search query
 		found, err := a.db.QueryResults(names[0], hometowns[0])
 		if err != nil {
+			log.Printf("error fetching results for name: %v\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("500 - Uh oh"))
 			return
