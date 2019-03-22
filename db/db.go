@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"log"
 	"math"
@@ -233,7 +232,7 @@ func (o *OurDB) QueryResults(name, hometown string) (*ResultsSummary, error) {
 	}
 
 	if len(results) == 0 {
-		return nil, errors.New("No results")
+		return &ResultsSummary{Lifter: name, Hometown: hometown}, nil
 	}
 
 	rs := ResultsSummary{Results: results}

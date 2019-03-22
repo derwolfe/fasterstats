@@ -169,7 +169,7 @@ var searchNamesResults = `{{ define "content" }}
 
 <div class="uk-card">
 	{{ if eq .Total 0 }}
-		<p> No lifters found</p>
+		<p>No lifters found</p>
 	{{ else }}
 		<p>Found {{ .Total }} matching lifters</li>
 
@@ -214,6 +214,10 @@ var resultsTable = `{{ define "content" }}
 	</form>
 </div>
 
+{{ if not .Results }}
+	No results found for {{ .Lifter }} from {{ .Hometown }}
+{{ end}}
+{{ if .Results }}
 <article class="uk-article">
 	<h1 class="uk-article-title">{{ .Lifter }} / {{ .Hometown }}</h1>
 	<h3>Links</h3>
@@ -287,6 +291,7 @@ var resultsTable = `{{ define "content" }}
 		</table>
 	</div>
 </div>
+{{ end }}
 {{ end }}`
 
 var liftingResults = `<!doctype html>
